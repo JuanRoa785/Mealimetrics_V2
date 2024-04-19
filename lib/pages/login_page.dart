@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:mealimetrics/pages/modal_recuperacion.dart';
 import 'package:mealimetrics/pages/home_gerente.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
-import 'package:mealimetrics/widgets/home_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -158,9 +157,6 @@ class _LoginPageState extends State<LoginPage> {
   final session = supabase.auth.currentSession;
   if (session!= null){
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const HomeGerente()));
-  }
-  else{
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const Home()));
   }
  }
 
