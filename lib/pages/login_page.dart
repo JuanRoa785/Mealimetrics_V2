@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mealimetrics/pages/modal_recuperacion.dart';
 import 'package:mealimetrics/pages/home_gerente.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'package:mealimetrics/widgets/home_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -14,11 +15,19 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-final TextEditingController passwordController = TextEditingController();
-final TextEditingController userNameController = TextEditingController();
 
-@override
-Widget build(BuildContext context) {
+  @override
+  void initState(){
+    super.initState();
+    _redirect();
+  }
+
+  final supabase = Supabase.instance.client;
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController userNameController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 126, 227, 252),
@@ -113,7 +122,7 @@ Widget build(BuildContext context) {
                       child: Text('Olvidaste Tu contraseña?',
                           style: TextStyle(
                               color: Color.fromARGB(255, 25, 0, 255),
-                              fontSize: 20.0,
+                              fontSize: 18.0,
                               fontWeight: FontWeight.bold))),
                 ]),
           ),
@@ -144,32 +153,49 @@ Widget build(BuildContext context) {
         type: 'password');
   }
 
+ Future<void> _redirect() async{
+  await Future.delayed(Duration.zero);
+  final session = supabase.auth.currentSession;
+  if (session!= null){
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const HomeGerente()));
+  }
+  else{
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const Home()));
+  }
+ }
+
  Future<void> signIn(BuildContext context) async {
-  final supabase = Supabase.instance.client;
     try {
       if(userNameController.text == '' || passwordController.text == ''){
-        _mostrarAlerta(context, "Por favor llenar todos los campos del formulario!");
+        _mostrarAlerta(context, "¡Por favor llenar todos los campos del formulario!");
+        return;
+      }
+      if(passwordController.text.length < 6){
+        _mostrarAlerta(context, "¡La contraseña debe tener minimo 6 caracteres!");
         return;
       }
 
+      //Consulta para ver si el usuario esta registrado:
       final usuario = userNameController.text;
       final correo = await supabase
       .from('empleado')
       .select('correo_electronico')
       .eq('user_name', usuario);
 
-      if(correo.length == 1){
-        await supabase.auth.signInWithPassword(
-          password: passwordController.text.trim(),
-          email: correo[0]['correo_electronico']
-        );
-        if (!mounted){
-          _mostrarAlerta(context, "Contraseña Incorrecta, Intentelo Nuevamente");
+      if(correo.length == 1){ 
+        try {
+          //Sign In por medio de auth - Supabase
+          await supabase.auth.signInWithPassword(
+            password: passwordController.text.trim(),
+            email: correo[0]['correo_electronico']
+          );
+          _redirect();
+        } catch (e) {
+          _mostrarAlerta(context, "¡Contraseña Incorrecta, Intentelo Nuevamente!");
         }
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const HomeGerente()));
       }
       else {
-        _mostrarAlerta(context, "El usuario '$usuario' NO esta registrado en el sistema de Mealimetrics. \n\nPorfavor registrese!");
+        _mostrarAlerta(context, "El usuario '$usuario' NO esta registrado en el sistema de Mealimetrics. \n\n¡Porfavor registrese!");
       }
     } on Exception catch (e) {
       final error = e.toString();
@@ -186,6 +212,7 @@ void _mostrarAlerta(BuildContext context, String mensaje) {
           content: Text(
             mensaje,
             style: TextStyle(fontSize: 20),
+            textAlign: TextAlign.center,
           ),
           actions: <Widget>[
             TextButton(

@@ -335,6 +335,7 @@ class _RegisterPageState extends State<RegisterPage> {
       }
       if (passwordController.text.length < 6 || repeatPasswordController.text.length <6){
         _mostrarAlerta(context, "¡Las contraseñas deben tener minimo 6 caracteres!");
+        return;
       }
       if (passwordController.text != repeatPasswordController.text) {
         _mostrarAlerta(context, "Las contraseñas no coinciden");
@@ -395,6 +396,7 @@ class _RegisterPageState extends State<RegisterPage> {
           content: Text(
             mensaje,
             style: const TextStyle(fontSize: 20),
+            textAlign: TextAlign.center,
           ),
           actions: <Widget>[
             TextButton(
