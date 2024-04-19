@@ -144,7 +144,7 @@ Widget build(BuildContext context) {
         type: 'password');
   }
 
- Future<void> signIn(BuildContext context ) async {
+ Future<void> signIn(BuildContext context) async {
   final supabase = Supabase.instance.client;
     try {
       if(userNameController.text == '' || passwordController.text == ''){
