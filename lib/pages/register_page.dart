@@ -433,13 +433,13 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _limpiarCampos() {
-  nameController.clear();
-  emailController.clear();
-  userNameController.clear();
-  passwordController.clear();
-  repeatPasswordController.clear();
-  documentoController.clear();
-}
+    nameController.clear();
+    emailController.clear();
+    userNameController.clear();
+    passwordController.clear();
+    repeatPasswordController.clear();
+    documentoController.clear();
+  }
 }
 
 class _TextFieldGeneral extends StatefulWidget {
