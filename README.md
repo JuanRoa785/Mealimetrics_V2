@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # mealimetrics
 
 A new Flutter project.
@@ -18,4 +17,3 @@ samples, guidance on mobile development, and a full API reference.
 =======
 # Meal-I-Metrics-App
 Este repositorio contiene los archivos que modelan la aplicación Meal-I-Metrics. Una aplicación para el servicio de restauración que permite administrar pedidos de un restaurante y mostrar estadísticas respecto a estos pedidos. En este lugar, se guardarán los archivos del desarrollo progresivo de la aplicación, tanto su frontend, como su backend.
->>>>>>> 82ab0cf4dfd4e5fb31864ae0de295169e0252a5d
