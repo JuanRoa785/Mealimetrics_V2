@@ -8,6 +8,7 @@ import 'package:mealimetrics/pages/home_gerente.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mealimetrics/widgets/home_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mealimetrics/widgets/custom_alert.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,10 +18,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   @override
   void initState(){
     super.initState();
+    cerrarSesiones();
     _redirect();
   }
 
@@ -168,10 +169,9 @@ class _LoginPageState extends State<LoginPage> {
         .eq('id_user', user.id);
 
       if(rol.length != 1){
-        _mostrarAlerta(context, 'Error interno de la base de datos (Mas de un Match)');
+        showCustomErrorDialog(context, 'Error interno de la base de datos (Mas de un Match)');
         return;
       }
-
       //Enrutamiento a partir del rol
       switch (rol[0]['rol']) {
         case 'Gerente':
@@ -187,75 +187,65 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeAdmin()));
           break;
         default:
-          _mostrarAlerta(context, '¡Rol Desconocido!, por favor comuniquese con la logitstica de Mealimetrics');
+          showCustomErrorDialog(context, '¡Rol Desconocido!, por favor comuniquese con la logitstica de Mealimetrics');
       }
     } catch (e) {
-      _mostrarAlerta(context, 'Ha ocurrido un error al redireccionarte, ¡intentalo nuevamente!');
+      showCustomErrorDialog(context, 'Ha ocurrido un error al redireccionarte, ¡intentalo nuevamente!');
     }
   }
  }
 
+  void cerrarSesiones(){
+    final supabase = Supabase.instance.client;
+    final session = supabase.auth.currentSession;
+    if (session!=null) {
+      supabase.auth.signOut();
+    } 
+  }
+
  Future<void> signIn(BuildContext context) async {
     try {
       if(userNameController.text == '' || passwordController.text == ''){
-        _mostrarAlerta(context, "¡Por favor llenar todos los campos del formulario!");
+        showCustomErrorDialog(context, "¡Por favor llenar todos los campos del formulario!");
         return;
       }
       if(passwordController.text.length < 6){
-        _mostrarAlerta(context, "¡La contraseña debe tener minimo 6 caracteres!");
+        showCustomErrorDialog(context, "¡La contraseña debe tener minimo 6 caracteres!");
         return;
       }
 
       //Consulta para ver si el usuario esta registrado:
       final usuario = userNameController.text;
-      final correo = await supabase
+      final datos = await supabase
       .from('empleado')
-      .select('correo_electronico')
+      .select('correo_electronico, estado_cuenta')
       .eq('user_name', usuario);
 
-      if(correo.length == 1){ 
+      if(datos.length == 1){ 
         try {
+          //Verificar que el usuario este activo
+          if (datos[0]['estado_cuenta'] != 'Activo') {
+            showCustomErrorDialog(context, '¡Su usuario fue desactivado! \n\nComuniquese con el gerente de la sucursal para activarlo nuevamente');
+            return;
+          }
           //Sign In por medio de auth - Supabase
           await supabase.auth.signInWithPassword(
             password: passwordController.text.trim(),
-            email: correo[0]['correo_electronico']
+            email: datos[0]['correo_electronico']
           );
           _redirect();
         } catch (e) {
-          _mostrarAlerta(context, "¡Contraseña Incorrecta, Intentelo Nuevamente!");
+          showCustomErrorDialog(context, "¡Contraseña Incorrecta, Intentelo Nuevamente!");
         }
       }
       else {
-        _mostrarAlerta(context, "El usuario '$usuario' NO esta registrado en el sistema de Mealimetrics. \n\n¡Porfavor registrese!");
+        showCustomErrorDialog(context, "El usuario '$usuario' NO esta registrado en el sistema de Mealimetrics. \n\n¡Porfavor registrese!");
+        return;
       }
     } on Exception catch (e) {
       final error = e.toString();
-      _mostrarAlerta(context, "Ha ocurrido un error Inesperado: \n\n$error");
+      showCustomErrorDialog(context, "Ha ocurrido un error Inesperado: \n\n$error");
     }
-  }
-
-void _mostrarAlerta(BuildContext context, String mensaje) {
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Error'),
-          content: Text(
-            mensaje,
-            style: TextStyle(fontSize: 20),
-            textAlign: TextAlign.center,
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }
 

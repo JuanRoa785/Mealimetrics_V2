@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mealimetrics/widgets/custom_alert.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -19,7 +20,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController userNameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController repeatPasswordController = TextEditingController();
+  final TextEditingController repeatPasswordController =
+      TextEditingController();
   final TextEditingController documentoController = TextEditingController();
 
   @override
@@ -325,113 +327,87 @@ class _RegisterPageState extends State<RegisterPage> {
           userNameController.text == "" ||
           passwordController.text == "" ||
           repeatPasswordController.text == "") {
-        _mostrarAlerta(
+        showCustomErrorDialog(
             context, "Por favor llenar todos los campos del formulario");
         return;
       }
       if (validarEmail(emailController.text) != true) {
-        _mostrarAlerta(context, "¡Digite un email valido!");
+        showCustomErrorDialog(context, "¡Digite un email valido!");
         return;
       }
-      if (passwordController.text.length < 6 || repeatPasswordController.text.length <6){
-        _mostrarAlerta(context, "¡Las contraseñas deben tener minimo 6 caracteres!");
+      if (passwordController.text.length < 6 ||
+          repeatPasswordController.text.length < 6) {
+        showCustomErrorDialog(
+            context, "¡Las contraseñas deben tener minimo 6 caracteres!");
         return;
       }
       if (passwordController.text != repeatPasswordController.text) {
-        _mostrarAlerta(context, "Las contraseñas no coinciden");
+        showCustomErrorDialog(context, "Las contraseñas no coinciden");
         return;
       }
 
       try {
-        await supabase.from('persona').insert({
-        'nombre_completo': nameController.text,
-        'id_tipo_documento': tipoDocumento[dropdownValueTD],
-        'numero_documento': documentoController.text
-      });
+        final verificacion = await supabase
+            .from('empleado')
+            .select('persona(numero_documento)')
+            .eq("user_name", userNameController.text);
+        //final documento = verificacion[0]['persona']['numero_documento'];
+        if (verificacion.isNotEmpty) {
+          showCustomErrorDialog(context, '¡El usuario ya esta registrado!');
+          return;
+        }
       } catch (e) {
-        _mostrarAlerta(context, "¡El usuario ya está registrado!");
+        showCustomErrorDialog(context, '¡Error interno de la DB!');
         return;
       }
 
-      final idPersona = await supabase
+      try {
+        //Se genera el usuario
+        await supabase.auth.signUp(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+      } catch (e) {
+        showCustomErrorDialog(context,
+            "¡Ya existe un usuario registrado con ese correo electronico!");
+        return;
+      }
+
+      try {
+        //si crear el usuario no da error, se inserta la persona
+        await supabase.from('persona').insert({
+          'nombre_completo': nameController.text,
+          'id_tipo_documento': tipoDocumento[dropdownValueTD],
+          'numero_documento': documentoController.text
+        });
+
+        final idPersona = await supabase
           .from('persona')
           .select('id')
           .eq('numero_documento', documentoController.text);
 
-      try {
-        //Se genera el usuario
-        final AuthResponse res = await supabase.auth.signUp(
-        email: emailController.text,
-        password: passwordController.text,
-        );
-        //En base al usuario se crea el empleado
-        final User? user = res.user;
-          await supabase.from('empleado').insert({
-            'correo_electronico': emailController.text,
-            'user_name': userNameController.text,
-            'id_persona': idPersona[0]['id'],
-            'rol': dropdownValueR,
-            'id_user': user?.id
-          });
-        
+        //En base al usuario y a la persona se crea el empleado
+        final User? user = supabase.auth.currentUser;
+        await supabase.from('empleado').insert({
+          'correo_electronico': emailController.text,
+          'user_name': userNameController.text,
+          'id_persona': idPersona[0]['id'],
+          'rol': dropdownValueR,
+          'id_user': user?.id
+        });
+
         //Al registrarse, inicia sesion, por lo que instantaneamente se cierra
         await supabase.auth.signOut();
-        _notificarExito(context);
+        showCustomExitDialog(context, "¡Se creo el usuario Exitosamente!");
         _limpiarCampos;
       } catch (e) {
-        _mostrarAlerta(context, "¡El usuario ya está registrado!"); 
-        return;    
+        showCustomErrorDialog(context, e.toString());
+        return;
       }
     } catch (e) {
-      _mostrarAlerta(context, e.toString());
+      showCustomErrorDialog(context, e.toString());
+      return;
     }
-  }
-
-  void _mostrarAlerta(BuildContext context, String mensaje) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Error'),
-          content: Text(
-            mensaje,
-            style: const TextStyle(fontSize: 20),
-            textAlign: TextAlign.center,
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _notificarExito(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Registro Completado'),
-          content: const Text(
-            "¡Se creo el usuario Exitosamente!",
-            style: TextStyle(fontSize: 20),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   void _limpiarCampos() {
@@ -462,8 +438,7 @@ class _TextFieldGeneral extends StatefulWidget {
       required this.icon,
       this.obscureText = false,
       required this.type,
-      required this.controller
-      });
+      required this.controller});
 
   @override
   _TextFieldGeneralState createState() => _TextFieldGeneralState();

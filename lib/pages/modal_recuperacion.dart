@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:mealimetrics/widgets/custom_alert.dart';
 
 class ModalRecuperacionWidget extends StatefulWidget {
   const ModalRecuperacionWidget({super.key});
@@ -184,108 +185,14 @@ void enviarCorreo(String userName, context) async {
             }
           }));
       if (response.statusCode == 200) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("Correo Enviado!"),
-              content: Text(
-                "Se envió el correo de recuperación a: \n\n$correoAEnviar",
-                style: const TextStyle(
-                  fontSize: 18,
-                  letterSpacing: 0,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              actions: <Widget>[
-                ElevatedButton(
-                  child: const Text("Aceptar"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop(); // Cerrar la alerta
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        showCustomExitDialog(context, "Se envió el correo de recuperación a: \n\n$correoAEnviar");
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("Error Envio Correo"),
-              content: Text(
-                "Sucedio un error al enviar el correo de recuperación a: \n\n$correoAEnviar",
-                style: const TextStyle(
-                  fontSize: 18,
-                  letterSpacing: 0,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              actions: <Widget>[
-                ElevatedButton(
-                  child: const Text("Aceptar"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop(); // Cerrar la alerta
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        showCustomErrorDialog(context, "Sucedio un error al enviar el correo de recuperación a: \n\n$correoAEnviar");
       }
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Error"),
-            content: const Text(
-              "El usuario proporcionado NO tiene una cuenta asociada a Mealimetrics",
-              style: TextStyle(
-                fontSize: 18,
-                letterSpacing: 0,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-            actions: <Widget>[
-              ElevatedButton(
-                child: const Text("Aceptar"),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Cerrar la alerta
-                },
-              ),
-            ],
-          );
-        },
-      );
+      showCustomErrorDialog(context, "El usuario proporcionado NO tiene una cuenta asociada a Mealimetrics");
     }
   } catch (e) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Error"),
-          content: Text(
-            e.toString(),
-            style: const TextStyle(
-              fontSize: 18,
-              letterSpacing: 0,
-              fontWeight: FontWeight.normal,
-            ),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              child: const Text("Aceptar"),
-              onPressed: () {
-                Navigator.of(context).pop(); // Cerrar la alerta
-              },
-            ),
-          ],
-        );
-      },
-    );
+    showCustomErrorDialog(context, e.toString());
   }
 }
