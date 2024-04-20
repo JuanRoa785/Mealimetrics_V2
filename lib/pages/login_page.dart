@@ -1,9 +1,12 @@
 //import 'package:animated_text_kit/animated_text_kit.dart';
 // ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'package:mealimetrics/pages/home_chef.dart';
+import 'package:mealimetrics/pages/home_mesero.dart';
 import 'package:mealimetrics/pages/modal_recuperacion.dart';
 import 'package:mealimetrics/pages/home_gerente.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'package:mealimetrics/widgets/home_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -155,8 +158,40 @@ class _LoginPageState extends State<LoginPage> {
  Future<void> _redirect() async{
   await Future.delayed(Duration.zero);
   final session = supabase.auth.currentSession;
-  if (session!= null){
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const HomeGerente()));
+  final user = supabase.auth.currentUser;
+  if (session != null && user != null){
+    try {
+      //obtenemos el rol del usuario que inició sesion
+      final rol = await supabase
+        .from('empleado')
+        .select('rol')
+        .eq('id_user', user.id);
+
+      if(rol.length != 1){
+        _mostrarAlerta(context, 'Error interno de la base de datos (Mas de un Match)');
+        return;
+      }
+
+      //Enrutamiento a partir del rol
+      switch (rol[0]['rol']) {
+        case 'Gerente':
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeGerente()));
+          break;
+        case 'Mesero':
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeMesero()));
+          break;
+        case 'Encargado De Cocina':
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeChef()));
+          break;
+        case 'Admin':
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeAdmin()));
+          break;
+        default:
+          _mostrarAlerta(context, '¡Rol Desconocido!, por favor comuniquese con la logitstica de Mealimetrics');
+      }
+    } catch (e) {
+      _mostrarAlerta(context, 'Ha ocurrido un error al redireccionarte, ¡intentalo nuevamente!');
+    }
   }
  }
 

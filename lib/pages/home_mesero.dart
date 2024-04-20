@@ -16,7 +16,7 @@ class _HomeMeseroState extends State<HomeMesero> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Home Gerente',
+          'Home Mesero',
           style: TextStyle(fontSize: 25,
            fontWeight: FontWeight.bold
           )

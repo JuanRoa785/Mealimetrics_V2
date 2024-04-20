@@ -16,7 +16,7 @@ class _HomeChefState extends State<HomeChef> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-            'Home Encargado Cocina',
+            'Home Encargado De Cocina',
             style: TextStyle(fontSize: 25,
             fontWeight: FontWeight.bold
             )

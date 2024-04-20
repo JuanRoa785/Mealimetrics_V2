@@ -20,7 +20,7 @@ class _HomeState extends State<Home> {
         title: const Text(
           "MealiMetrics",
           style: TextStyle(
-            color: Colors.yellow,
+            color: Color.fromARGB(255, 234, 255, 1),
             fontSize: 40,
             fontWeight: FontWeight.bold,
           ),
