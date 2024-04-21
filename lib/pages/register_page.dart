@@ -327,8 +327,7 @@ class _RegisterPageState extends State<RegisterPage> {
           userNameController.text == "" ||
           passwordController.text == "" ||
           repeatPasswordController.text == "") {
-        showCustomErrorDialog(
-            context, "Por favor llenar todos los campos del formulario");
+        showCustomErrorDialog(context, "¡Por favor llenar todos los campos del formulario!");
         return;
       }
       if (validarEmail(emailController.text) != true) {
@@ -347,13 +346,24 @@ class _RegisterPageState extends State<RegisterPage> {
       }
 
       try {
-        final verificacion = await supabase
+        final verificacion1 = await supabase
             .from('empleado')
             .select('persona(numero_documento)')
             .eq("user_name", userNameController.text);
-        //final documento = verificacion[0]['persona']['numero_documento'];
-        if (verificacion.isNotEmpty) {
-          showCustomErrorDialog(context, '¡El usuario ya esta registrado!');
+
+        final verificacion2 = await supabase
+            .from('persona')
+            .select('numero_documento')
+            .eq("numero_documento", documentoController.text);
+        
+        //Si el empleado ya existe devuelve error.
+        if (verificacion1.isNotEmpty) {
+          showCustomErrorDialog(context, '¡Ese nombre de usuario ya esta registrado!');
+          return;
+        }
+        //si un empleado con diferente user_name se quiere escribir manda error
+        if (verificacion2.isNotEmpty){
+          showCustomErrorDialog(context, '¡Existe un usuario registrado con ese número de documento!');
           return;
         }
       } catch (e) {
@@ -368,8 +378,7 @@ class _RegisterPageState extends State<RegisterPage> {
           password: passwordController.text,
         );
       } catch (e) {
-        showCustomErrorDialog(context,
-            "¡Ya existe un usuario registrado con ese correo electronico!");
+        showCustomErrorDialog(context, "¡Ya existe un usuario registrado con ese correo electronico!");
         return;
       }
 
@@ -380,8 +389,13 @@ class _RegisterPageState extends State<RegisterPage> {
           'id_tipo_documento': tipoDocumento[dropdownValueTD],
           'numero_documento': documentoController.text
         });
+      } catch (e) {
+        showCustomErrorDialog(context, e.toString());
+        return;
+      }
 
-        final idPersona = await supabase
+      try {
+          final idPersona = await supabase
           .from('persona')
           .select('id')
           .eq('numero_documento', documentoController.text);
@@ -399,11 +413,11 @@ class _RegisterPageState extends State<RegisterPage> {
         //Al registrarse, inicia sesion, por lo que instantaneamente se cierra
         await supabase.auth.signOut();
         showCustomExitDialog(context, "¡Se creo el usuario Exitosamente!");
-        _limpiarCampos;
+        _limpiarCampos();
       } catch (e) {
         showCustomErrorDialog(context, e.toString());
-        return;
       }
+
     } catch (e) {
       showCustomErrorDialog(context, e.toString());
       return;
