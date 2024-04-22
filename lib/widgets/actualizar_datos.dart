@@ -167,7 +167,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Actualizar Nombre"),
+          title: Text("Actualizar $parametro"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -207,7 +207,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Actualizar Nombre"),
+          title: Text("Actualizar $parametro"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
