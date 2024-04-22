@@ -76,7 +76,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
               _buildTextFieldWithButton(
                 labelText: "Numero de documento",
                 controller: numeroDocumentoController,
-                parametro: "nombre",
+                parametro: "Numero de documento",
                 onPressed: actualizarTexto,
               ),
               const SizedBox(height: 18.0),
