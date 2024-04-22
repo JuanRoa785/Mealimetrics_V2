@@ -2,22 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';
 
-class HomeGerente extends StatefulWidget {
-  const HomeGerente({Key? key});
+class HomeChef extends StatefulWidget {
+  const HomeChef({super.key});
 
   @override
-  State<HomeGerente> createState() => _HomeGerenteState();
+  State<HomeChef> createState() => _HomeChefState();
 }
 
-class _HomeGerenteState extends State<HomeGerente> {
+class _HomeChefState extends State<HomeChef> {
   final supabase = Supabase.instance.client;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-            'Home Gerente',
+            'Home Encargado De Cocina',
             style: TextStyle(fontSize: 25,
             fontWeight: FontWeight.bold
             )
@@ -28,14 +27,6 @@ class _HomeGerenteState extends State<HomeGerente> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pushNamed(context, '/actualizarDatos'); // Navega a la página de Actualizar Datos
-              },
-              icon: const Icon(Icons.update), // Ícono para actualizar datos
-              label: const Text('Actualizar Datos'), // Texto del botón
-            ),
-            const SizedBox(height: 20), // Espaciador
             ElevatedButton.icon(
               onPressed: () {
                 signOut();
@@ -51,7 +42,8 @@ class _HomeGerenteState extends State<HomeGerente> {
 
   Future<void> signOut() async {
     await supabase.auth.signOut();
-    if (!mounted) return;
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Home()));
+    if(!mounted) return;
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const Home()));
   }
+
 }

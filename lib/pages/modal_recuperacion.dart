@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:mealimetrics/widgets/custom_alert.dart';
 
 class ModalRecuperacionWidget extends StatefulWidget {
   const ModalRecuperacionWidget({super.key});
 
   @override
-  State<ModalRecuperacionWidget> createState() => _ModalRecuperacionWidgetState();
+  State<ModalRecuperacionWidget> createState() =>
+      _ModalRecuperacionWidgetState();
 }
 
 class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
@@ -53,7 +55,7 @@ class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
                         '¿Olvidaste tu contraseña?',
                         style: TextStyle(
                           fontFamily: 'Outfit',
-                          color:  Color(0xFF14181B),
+                          color: Color(0xFF14181B),
                           fontSize: 24,
                           letterSpacing: 0,
                           fontWeight: FontWeight.normal,
@@ -126,13 +128,15 @@ class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
                   alignment: Alignment.center,
                   child: ElevatedButton(
                     onPressed: () {
-                        final userName = _emailAddressController.text;
-                        enviarCorreo(userName, context);
+                      final userName = _emailAddressController.text;
+                      enviarCorreo(userName, context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                     child: const Text(
                       'Enviar Correo',
@@ -157,136 +161,38 @@ class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
 
 void enviarCorreo(String userName, context) async {
   try {
-      final datos = await Supabase.instance.client
-      .from('empleado')
-      .select('id_user, correo_electronico')
-      .eq("user_name", userName);
+    final datos = await Supabase.instance.client
+        .from('empleado')
+        .select('id_user, correo_electronico')
+        .eq("user_name", userName);
 
-      if (datos.length == 1) {
-        //Enviar el Correo
-        final correoAEnviar = datos[0]['correo_electronico'].toString();
-        final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
-        const serviceId = "service_1yeeknn";
-        const templateId = "template_hu4ne38";
-        const userId = "NNbgVVCzlKNUVd3PA";
-        final response = await http.post(url, 
-        headers: {'Content-Type': 'application/json'},
+    if (datos.length == 1) {
+      //Enviar el Correo
+      final correoAEnviar = datos[0]['correo_electronico'].toString();
+      final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
+      const serviceId = "service_1yeeknn";
+      const templateId = "template_hu4ne38";
+      const userId = "NNbgVVCzlKNUVd3PA";
+      final response = await http.post(url,
+          headers: {'Content-Type': 'application/json'},
           body: json.encode({
-              "service_id": serviceId,
-              "template_id": templateId,
-              "user_id": userId,
-              "template_params": {
+            "service_id": serviceId,
+            "template_id": templateId,
+            "user_id": userId,
+            "template_params": {
               "email_to": correoAEnviar,
               "password": datos[0]['contrasena'].toString()
-              }
-          })
-        );
-        if(response.statusCode == 200){
-            showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text("Correo Enviado!"),
-                content: Text(
-                  "Se envió el correo de recuperación a: \n\n$correoAEnviar",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    letterSpacing: 0,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                actions: <Widget>[
-                  ElevatedButton(
-                    child: const Text("Aceptar"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop(); // Cerrar la alerta
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
-        else{
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text("Error Envio Correo"),
-                content: Text(
-                  "Sucedio un error al enviar el correo de recuperación a: \n\n$correoAEnviar",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    letterSpacing: 0,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                actions: <Widget>[
-                  ElevatedButton(
-                    child: const Text("Aceptar"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();  // Cerrar la alerta
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
-        
+            }
+          }));
+      if (response.statusCode == 200) {
+        showCustomExitDialog(context, "Se envió el correo de recuperación a: \n\n$correoAEnviar");
+      } else {
+        showCustomErrorDialog(context, "Sucedio un error al enviar el correo de recuperación a: \n\n$correoAEnviar");
       }
-      else{
-        showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Error"),
-            content: const Text(
-                "El usuario proporcionado NO tiene una cuenta asociada a Mealimetrics",
-                style: TextStyle(
-                    fontSize: 18,
-                    letterSpacing: 0,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-            actions: <Widget>[
-              ElevatedButton(
-                child: const Text("Aceptar"),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Cerrar la alerta
-                },
-              ),
-            ],
-          );
-        },
-      );
-      }
+    } else {
+      showCustomErrorDialog(context, "El usuario proporcionado NO tiene una cuenta asociada a Mealimetrics");
+    }
   } catch (e) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Error"),
-            content: Text(
-                e.toString(),
-                style: const TextStyle(
-                    fontSize: 18,
-                    letterSpacing: 0,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-            actions: <Widget>[
-              ElevatedButton(
-                child: const Text("Aceptar"),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Cerrar la alerta
-                },
-              ),
-            ],
-          );
-        },
-      );
+    showCustomErrorDialog(context, e.toString());
   }
 }

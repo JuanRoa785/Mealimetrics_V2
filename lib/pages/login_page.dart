@@ -1,10 +1,14 @@
 //import 'package:animated_text_kit/animated_text_kit.dart';
 // ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'package:mealimetrics/pages/home_chef.dart';
+import 'package:mealimetrics/pages/home_mesero.dart';
 import 'package:mealimetrics/pages/modal_recuperacion.dart';
 import 'package:mealimetrics/pages/home_gerente.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'package:mealimetrics/widgets/home_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mealimetrics/widgets/custom_alert.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,11 +18,19 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-final TextEditingController passwordController = TextEditingController();
-final TextEditingController userNameController = TextEditingController();
+  @override
+  void initState(){
+    super.initState();
+    cerrarSesiones();
+    _redirect();
+  }
 
-@override
-Widget build(BuildContext context) {
+  final supabase = Supabase.instance.client;
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController userNameController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 126, 227, 252),
@@ -113,7 +125,7 @@ Widget build(BuildContext context) {
                       child: Text('Olvidaste Tu contraseña?',
                           style: TextStyle(
                               color: Color.fromARGB(255, 25, 0, 255),
-                              fontSize: 20.0,
+                              fontSize: 18.0,
                               fontWeight: FontWeight.bold))),
                 ]),
           ),
@@ -144,60 +156,96 @@ Widget build(BuildContext context) {
         type: 'password');
   }
 
- Future<void> signIn(BuildContext context ) async {
-  final supabase = Supabase.instance.client;
+ Future<void> _redirect() async{
+  await Future.delayed(Duration.zero);
+  final session = supabase.auth.currentSession;
+  final user = supabase.auth.currentUser;
+  if (session != null && user != null){
+    try {
+      //obtenemos el rol del usuario que inició sesion
+      final rol = await supabase
+        .from('empleado')
+        .select('rol')
+        .eq('id_user', user.id);
+
+      if(rol.length != 1){
+        showCustomErrorDialog(context, 'Error interno de la base de datos (Mas de un Match)');
+        return;
+      }
+      //Enrutamiento a partir del rol
+      switch (rol[0]['rol']) {
+        case 'Gerente':
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeGerente()));
+          break;
+        case 'Mesero':
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeMesero()));
+          break;
+        case 'Encargado De Cocina':
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeChef()));
+          break;
+        case 'Admin':
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeAdmin()));
+          break;
+        default:
+          showCustomErrorDialog(context, '¡Rol Desconocido!, por favor comuniquese con la logitstica de Mealimetrics');
+      }
+    } catch (e) {
+      showCustomErrorDialog(context, 'Ha ocurrido un error al redireccionarte, ¡intentalo nuevamente!');
+    }
+  }
+ }
+
+  void cerrarSesiones(){
+    final supabase = Supabase.instance.client;
+    final session = supabase.auth.currentSession;
+    if (session!=null) {
+      supabase.auth.signOut();
+    } 
+  }
+
+ Future<void> signIn(BuildContext context) async {
     try {
       if(userNameController.text == '' || passwordController.text == ''){
-        _mostrarAlerta(context, "Por favor llenar todos los campos del formulario!");
+        showCustomErrorDialog(context, "¡Por favor llenar todos los campos del formulario!");
+        return;
+      }
+      if(passwordController.text.length < 6){
+        showCustomErrorDialog(context, "¡La contraseña debe tener minimo 6 caracteres!");
         return;
       }
 
+      //Consulta para ver si el usuario esta registrado:
       final usuario = userNameController.text;
-      final correo = await supabase
+      final datos = await supabase
       .from('empleado')
-      .select('correo_electronico')
+      .select('correo_electronico, estado_cuenta')
       .eq('user_name', usuario);
 
-      if(correo.length == 1){
-        await supabase.auth.signInWithPassword(
-          password: passwordController.text.trim(),
-          email: correo[0]['correo_electronico']
-        );
-        if (!mounted){
-          _mostrarAlerta(context, "Contraseña Incorrecta, Intentelo Nuevamente");
+      if(datos.length == 1){ 
+        try {
+          //Verificar que el usuario este activo
+          if (datos[0]['estado_cuenta'] != 'Activo') {
+            showCustomErrorDialog(context, '¡Su usuario fue desactivado! \n\nComuniquese con el gerente de la sucursal para activarlo nuevamente');
+            return;
+          }
+          //Sign In por medio de auth - Supabase
+          await supabase.auth.signInWithPassword(
+            password: passwordController.text.trim(),
+            email: datos[0]['correo_electronico']
+          );
+          _redirect();
+        } catch (e) {
+          showCustomErrorDialog(context, "¡Contraseña Incorrecta, Intentelo Nuevamente!");
         }
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const HomeGerente()));
       }
       else {
-        _mostrarAlerta(context, "El usuario '$usuario' NO esta registrado en el sistema de Mealimetrics. \n\nPorfavor registrese!");
+        showCustomErrorDialog(context, "El usuario '$usuario' NO esta registrado en el sistema de Mealimetrics. \n\n¡Porfavor registrese!");
+        return;
       }
     } on Exception catch (e) {
       final error = e.toString();
-      _mostrarAlerta(context, "Ha ocurrido un error Inesperado: \n\n$error");
+      showCustomErrorDialog(context, "Ha ocurrido un error Inesperado: \n\n$error");
     }
-  }
-
-void _mostrarAlerta(BuildContext context, String mensaje) {
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Error'),
-          content: Text(
-            mensaje,
-            style: TextStyle(fontSize: 20),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }
 
