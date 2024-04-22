@@ -262,18 +262,18 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       3: "R.C", 
       4: "T.I"};
 
-    nameController.text = datosPersona[0]["persona"]["nombre_completo"];
-    sexoController.text = dicSexo[datosPersona[0]["persona"]["id_sexo"]] ?? "NA";
-    fechaNacimientoController.text = datosPersona[0]["persona"]["fecha_nacimiento"];
+    nameController.text = datosPersona[0]["persona"]["nombre_completo"] ?? "Null";
+    sexoController.text = dicSexo[datosPersona[0]["persona"]["id_sexo"]] ?? "N.A";
+    fechaNacimientoController.text = datosPersona[0]["persona"]["fecha_nacimiento"]?? "Null";
     numeroDocumentoController.text = datosPersona[0]["persona"]["numero_documento"];
-    tipoDocumentoController.text = dicTipoDocumento[datosPersona[0]["persona"]["id_tipo_documento"]] ??"NA";
+    tipoDocumentoController.text = dicTipoDocumento[datosPersona[0]["persona"]["id_tipo_documento"]] ?? "NA";
 
     final datosEmpleado = await supabase
         .from('empleado')
         .select('user_name, correo_electronico')
         .eq("id_user", idUser as Object);
 
-    userNameController.text = datosEmpleado[0]["user_name"];
-    emailController.text = datosEmpleado[0]["correo_electronico"];
+    userNameController.text = datosEmpleado[0]["user_name"] ?? "Null";
+    emailController.text = datosEmpleado[0]["correo_electronico"] ;
   }
 }
