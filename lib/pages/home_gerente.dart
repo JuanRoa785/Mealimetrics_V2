@@ -3,7 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';
 
 class HomeGerente extends StatefulWidget {
-  const HomeGerente({super.key});
+  const HomeGerente({Key? key});
 
   @override
   State<HomeGerente> createState() => _HomeGerenteState();
@@ -11,6 +11,7 @@ class HomeGerente extends StatefulWidget {
 
 class _HomeGerenteState extends State<HomeGerente> {
   final supabase = Supabase.instance.client;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,6 +22,14 @@ class _HomeGerenteState extends State<HomeGerente> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, '/actualizarDatos'); // Navega a la página de Actualizar Datos
+              },
+              icon: const Icon(Icons.update), // Ícono para actualizar datos
+              label: const Text('Actualizar Datos'), // Texto del botón
+            ),
+            const SizedBox(height: 20), // Espaciador
             ElevatedButton.icon(
               onPressed: () {
                 signOut();
@@ -36,8 +45,7 @@ class _HomeGerenteState extends State<HomeGerente> {
 
   Future<void> signOut() async {
     await supabase.auth.signOut();
-    if(!mounted) return;
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const Home()));
+    if (!mounted) return;
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Home()));
   }
-
 }

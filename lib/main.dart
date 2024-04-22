@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';
+import 'package:mealimetrics/widgets/actualizar_datos.dart';
 
 
 const supabaseUrl = 'https://ddyveuettsjaxmdbijgb.supabase.co';
@@ -42,6 +43,8 @@ class MyApp extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         // Splash page is needed to ensure that authentication and page loading works correctly
         '/': (_) => const Home(),
+          // Ruta para la página de actualización de datos
+        '/actualizarDatos': (_) => const ActualizarDatos(),
       },
     );
   }
