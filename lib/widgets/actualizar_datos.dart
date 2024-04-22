@@ -28,7 +28,9 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('Actualizar Datos'),
+        backgroundColor: const Color.fromARGB(255, 111, 209, 254),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -39,51 +41,50 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
               _buildTextFieldWithButton(
                 labelText: "Nombre Completo",
                 controller: nameController,
-                onPressed: actualizarTexto("nombre"),
+                parametro: "Nombre",
+                onPressed: actualizarTexto,
               ),
               const SizedBox(height: 18.0),
               _buildTextFieldWithButton(
                 labelText: "Correo Electrónico",
                 controller: emailController,
-                onPressed: actualizarTexto("nombre"),
+                parametro: "Email",
+                onPressed: actualizarTexto,
               ),
               const SizedBox(height: 18.0),
               _buildTextFieldWithButton(
                 labelText: "Genero",
                 controller: sexoController,
-                onPressed: actualizarTexto("nombre"),
+                parametro: "Genero",
+                onPressed: actualizarScroll,
               ),
               const SizedBox(height: 18.0),
               _buildTextFieldWithButton(
                 labelText: "Fecha de nacimiento",
                 controller: fechaNacimientoController,
-                onPressed: actualizarTexto("nombre"),
+                parametro: "Fecha de Nacimiento",
+                onPressed: actualizarFechaNac,
               ),
               const SizedBox(height: 18.0),
               _buildTextFieldWithButton(
                 labelText: "Tipo de documento",
                 controller: tipoDocumentoController,
-                onPressed: actualizarTexto("nombre"),
+                parametro: "Tipo de Documento",
+                onPressed: actualizarScroll,
               ),
               const SizedBox(height: 18.0),
               _buildTextFieldWithButton(
                 labelText: "Numero de documento",
                 controller: numeroDocumentoController,
-                onPressed: actualizarTexto("nombre"),
+                parametro: "nombre",
+                onPressed: actualizarTexto,
               ),
               const SizedBox(height: 18.0),
               _buildTextFieldWithButton(
                 labelText: "Usuario",
-            controller: userNameController,
-            onPressed: actualizarTexto("nombre"),
-          ),
-          const SizedBox(height: 18.0),
-          ElevatedButton(
-            onPressed: () {
-              // Aquí irá la lógica de actualización para todos los campos
-              cargarDatos();
-            },
-            child: const Text('Actualizar'),
+                parametro: "Usuario (Login)",
+                controller: userNameController,
+                onPressed: actualizarTexto,
           ),
         ],
       ),
@@ -95,7 +96,8 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
   Widget _buildTextFieldWithButton({
     required String labelText,
     required TextEditingController controller,
-    required Future<void> onPressed,
+    required void Function(String) onPressed,
+    required String parametro,
   }) {
     return Row(
       children: [
@@ -105,12 +107,13 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
             controller: controller,
             decoration: InputDecoration(
               labelText: labelText,
+              labelStyle: const TextStyle(fontSize: 18),
             ),
           ),
         ),
         const SizedBox(width: 10), // Añade un espacio entre el TextField y el botón
         ElevatedButton(
-          onPressed: onPressed ??(){},
+          onPressed: () => onPressed(parametro),
           child: const Icon(Icons.update), // Puedes cambiar el icono o el texto según prefieras
         ),
       ],
@@ -157,7 +160,47 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
     );
   }
 
-  Future<void> actualizarScroll() async {
+  Future<void> actualizarScroll(String parametro) async {
+    final TextEditingController newNameController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Actualizar Nombre"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: newNameController,
+                decoration: const InputDecoration(labelText: 'Nuevo Nombre'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cierra el modal
+              },
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Aquí puedes agregar la lógica para actualizar el nombre con el valor en _newNameController.text
+                // Por ejemplo:
+                String nuevoNombre = newNameController.text;
+                Navigator.of(context)
+                    .pop(); // Cierra el modal después de actualizar
+              },
+              child: const Text('Actualizar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> actualizarFechaNac(String parametro) async {
     final TextEditingController newNameController = TextEditingController();
 
     await showDialog(
