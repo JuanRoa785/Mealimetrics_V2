@@ -3,7 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';
 
 class HomeGerente extends StatefulWidget {
-  const HomeGerente({Key? key});
+  const HomeGerente({super.key});
 
   @override
   State<HomeGerente> createState() => _HomeGerenteState();
