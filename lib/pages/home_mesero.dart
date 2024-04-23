@@ -23,10 +23,18 @@ class _HomeMeseroState extends State<HomeMesero> {
         ),
         centerTitle: true,
       ),
-      body: Center(
+   body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, '/actualizarDatos'); // Navega a la página de Actualizar Datos
+              },
+              icon: const Icon(Icons.update), // Ícono para actualizar datos
+              label: const Text('Actualizar Datos'), // Texto del botón
+            ),
+            const SizedBox(height: 20), // Espaciador
             ElevatedButton.icon(
               onPressed: () {
                 signOut();

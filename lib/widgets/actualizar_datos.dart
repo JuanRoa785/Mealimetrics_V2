@@ -145,10 +145,20 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
               child: const Text('Cancelar'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 // Aquí puedes agregar la lógica para actualizar el nombre con el valor en _newNameController.text
                 // Por ejemplo:
                 String nuevoNombre = newDataController.text;
+                try {
+                final response = await supabase
+                .from('persona')
+                .update({'nombre_completo': nuevoNombre})
+                .match({'numero_documento': numeroDocumentoController.text });
+                cargarDatos();
+                } catch (e) {
+                  print(e.toString());
+
+                }
                 Navigator.of(context)
                     .pop(); // Cierra el modal después de actualizar
               },
@@ -173,7 +183,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
             children: [
               TextField(
                 controller: newNameController,
-                decoration: const InputDecoration(labelText: 'Nuevo Nombre'),
+                decoration: const InputDecoration(labelText: 'Nuevo Valor'),
               ),
             ],
           ),
@@ -213,7 +223,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
             children: [
               TextField(
                 controller: newNameController,
-                decoration: const InputDecoration(labelText: 'Nuevo Nombre'),
+                decoration: const InputDecoration(labelText: 'Nueva Fecha'),
               ),
             ],
           ),
