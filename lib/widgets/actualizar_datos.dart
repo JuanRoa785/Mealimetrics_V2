@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mealimetrics/widgets/custom_alert.dart';
 
 class ActualizarDatos extends StatefulWidget {
   const ActualizarDatos({super.key});
@@ -148,15 +149,25 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
               onPressed: () async {
                 // Aquí puedes agregar la lógica para actualizar el nombre con el valor en _newNameController.text
                 // Por ejemplo:
-                String nuevoNombre = newDataController.text;
+                String nuevoParametro = newDataController.text;
                 try {
-                final response = await supabase
+                if (parametro == "Nombre") {
+                await supabase
                 .from('persona')
-                .update({'nombre_completo': nuevoNombre})
+                .update({'nombre_completo': nuevoParametro})
                 .match({'numero_documento': numeroDocumentoController.text });
                 cargarDatos();
+                }
+
+                else if (parametro == "Email") {
+                await supabase
+                .from('empleado')
+                .update({'correo_electronico': nuevoParametro})
+                .match({'user_name': userNameController.text });
+                cargarDatos();
+                }
                 } catch (e) {
-                  print(e.toString());
+                  showCustomErrorDialog(context,e.toString());
 
                 }
                 Navigator.of(context)
