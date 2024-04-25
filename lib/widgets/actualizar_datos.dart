@@ -236,7 +236,6 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
                         UserAttributes(
                         email: nuevoParametro,
                         ),
-                        emailRedirectTo: 'io.supabase.flutterquickstart://login-callback/'
                       );
                     } catch (e) {
                       showCustomErrorDialog(context, 'Error al actualizar el correo');
