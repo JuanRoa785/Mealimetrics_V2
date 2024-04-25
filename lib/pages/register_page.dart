@@ -330,7 +330,7 @@ class _RegisterPageState extends State<RegisterPage> {
         showCustomErrorDialog(context, "¡Por favor llenar todos los campos del formulario!");
         return;
       }
-      if (validarEmail(emailController.text) != true) {
+      if (validarEmail(emailController.text.trim()) != true) {
         showCustomErrorDialog(context, "¡Digite un email valido!");
         return;
       }
@@ -340,8 +340,13 @@ class _RegisterPageState extends State<RegisterPage> {
             context, "¡Las contraseñas deben tener minimo 6 caracteres!");
         return;
       }
-      if (passwordController.text != repeatPasswordController.text) {
+      if (passwordController.text.trim() != repeatPasswordController.text.trim()) {
         showCustomErrorDialog(context, "Las contraseñas no coinciden");
+        return;
+      }
+
+      if (documentoController.text.trim().contains(RegExp(r'[a-zA-Z]'))){
+        showCustomErrorDialog(context, '¡El documento solo debe contener números!');
         return;
       }
 
@@ -349,12 +354,12 @@ class _RegisterPageState extends State<RegisterPage> {
         final verificacion1 = await supabase
             .from('empleado')
             .select('persona(numero_documento)')
-            .eq("user_name", userNameController.text);
+            .eq("user_name", userNameController.text.trim());
 
         final verificacion2 = await supabase
             .from('persona')
             .select('numero_documento')
-            .eq("numero_documento", documentoController.text);
+            .eq("numero_documento", documentoController.text.trim());
         
         //Si el empleado ya existe devuelve error.
         if (verificacion1.isNotEmpty) {
@@ -374,8 +379,8 @@ class _RegisterPageState extends State<RegisterPage> {
       try {
         //Se genera el usuario
         await supabase.auth.signUp(
-          email: emailController.text,
-          password: passwordController.text,
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
         );
       } catch (e) {
         showCustomErrorDialog(context, "¡Ya existe un usuario registrado con ese correo electronico!");
@@ -385,9 +390,9 @@ class _RegisterPageState extends State<RegisterPage> {
       try {
         //si crear el usuario no da error, se inserta la persona
         await supabase.from('persona').insert({
-          'nombre_completo': nameController.text,
+          'nombre_completo': nameController.text.trim(),
           'id_tipo_documento': tipoDocumento[dropdownValueTD],
-          'numero_documento': documentoController.text
+          'numero_documento': documentoController.text.trim()
         });
       } catch (e) {
         showCustomErrorDialog(context, e.toString());
@@ -398,13 +403,13 @@ class _RegisterPageState extends State<RegisterPage> {
           final idPersona = await supabase
           .from('persona')
           .select('id')
-          .eq('numero_documento', documentoController.text);
+          .eq('numero_documento', documentoController.text.trim());
 
         //En base al usuario y a la persona se crea el empleado
         final User? user = supabase.auth.currentUser;
         await supabase.from('empleado').insert({
-          'correo_electronico': emailController.text,
-          'user_name': userNameController.text,
+          'correo_electronico': emailController.text.trim(),
+          'user_name': userNameController.text.trim(),
           'id_persona': idPersona[0]['id'],
           'rol': dropdownValueR,
           'id_user': user?.id

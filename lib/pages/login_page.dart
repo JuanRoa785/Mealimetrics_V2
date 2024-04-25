@@ -215,7 +215,7 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       //Consulta para ver si el usuario esta registrado:
-      final usuario = userNameController.text;
+      final usuario = userNameController.text.trim();
       final datos = await supabase
       .from('empleado')
       .select('correo_electronico, estado_cuenta')
@@ -230,7 +230,7 @@ class _LoginPageState extends State<LoginPage> {
           }
           //Sign In por medio de auth - Supabase
           await supabase.auth.signInWithPassword(
-            password: passwordController.text.trim(),
+            password: passwordController.text,
             email: datos[0]['correo_electronico']
           );
           _redirect();

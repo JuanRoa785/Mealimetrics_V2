@@ -5,7 +5,7 @@ class CustomAlertDialog extends StatelessWidget {
   final String message;
   final IconData icon;
   final Color iconColor;
-  final Color backgroundColor;
+  //final Color backgroundColor;
 
   const CustomAlertDialog({
     super.key,
@@ -13,13 +13,13 @@ class CustomAlertDialog extends StatelessWidget {
     required this.message,
     required this.icon,
     required this.iconColor,
-    required this.backgroundColor,
+    //required this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: backgroundColor,
+      //backgroundColor: backgroundColor,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -63,7 +63,7 @@ void showCustomErrorDialog(BuildContext context, String error) {
         message: error,
         icon: Icons.error,
         iconColor: Colors.red,
-        backgroundColor: Colors.white,
+        //backgroundColor: Colors.white,
       );
     },
   );
@@ -78,7 +78,7 @@ void showCustomExitDialog(BuildContext context, String mensaje) {
         message: mensaje,
         icon: Icons.check_circle, // Icono de marca de verificación para indicar éxito
         iconColor: Colors.green, // Color del icono para indicar éxito
-        backgroundColor: Colors.white, // Color de fondo del diálogo
+        //backgroundColor: Colors.white, // Color de fondo del diálogo
       );
     },
   );

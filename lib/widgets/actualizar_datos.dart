@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
@@ -50,7 +52,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
                 labelText: "Correo Electrónico",
                 controller: emailController,
                 parametro: "Email",
-                onPressed: actualizarTexto,
+                onPressed: actualizarEmail,
               ),
               const SizedBox(height: 18.0),
               _buildTextFieldWithButton(
@@ -128,7 +130,9 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Actualizar $parametro"),
+          title: Center(
+            child: Text("Actualizar $parametro"),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -147,31 +151,37 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
             ),
             ElevatedButton(
               onPressed: () async {
-                // Aquí puedes agregar la lógica para actualizar el nombre con el valor en _newNameController.text
-                // Por ejemplo:
-                String nuevoParametro = newDataController.text;
+                String nuevoParametro = newDataController.text.trim();
                 try {
-                if (parametro == "Nombre") {
-                await supabase
-                .from('persona')
-                .update({'nombre_completo': nuevoParametro})
-                .match({'numero_documento': numeroDocumentoController.text });
-                cargarDatos();
-                }
-
-                else if (parametro == "Email") {
-                await supabase
-                .from('empleado')
-                .update({'correo_electronico': nuevoParametro})
-                .match({'user_name': userNameController.text });
-                cargarDatos();
-                }
+                  if (nuevoParametro == '') {
+                    showCustomErrorDialog(context, '¡Digite un nuevo valor valido!');
+                    return;
+                  }
+                  if (parametro == "Nombre") {
+                    await supabase
+                    .from('persona')
+                    .update({'nombre_completo': nuevoParametro})
+                    .match({'numero_documento': numeroDocumentoController.text});
+                    cargarDatos();
+                    Navigator.of(context).pop();
+                  }
+                  else if (parametro == "Numero de documento"){
+                    if (nuevoParametro.contains(RegExp(r'[a-zA-Z]'))){
+                      showCustomErrorDialog(context, '¡El documento solo debe contener números!');
+                      return;
+                    }
+                    else{
+                      await supabase
+                        .from('persona')
+                        .update({'numero_documento': nuevoParametro})
+                        .match({'numero_documento': numeroDocumentoController.text });
+                      cargarDatos();
+                      Navigator.of(context).pop();
+                    }
+                  }
                 } catch (e) {
                   showCustomErrorDialog(context,e.toString());
-
                 }
-                Navigator.of(context)
-                    .pop(); // Cierra el modal después de actualizar
               },
               child: const Text('Actualizar'),
             ),
@@ -179,6 +189,84 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
         );
       },
     );
+  }
+
+  Future<void> actualizarEmail(String parametro) async {
+    final TextEditingController newDataController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(
+            child: Text("Actualizar $parametro"),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+                const Text(
+                "Nota: Te va a llegar un correo de verificación. Tendrás 1 hora para abrirlo, de lo contrario se bloqueará tu cuenta.",
+                textAlign: TextAlign.justify,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                controller: newDataController,
+                decoration: const InputDecoration(labelText: 'Nuevo Correo'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cierra el modal
+              },
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                String nuevoParametro = newDataController.text.trim();
+                try {
+                  if (parametro == "Email") {
+                    if (validarEmail(nuevoParametro) != true) {
+                      showCustomErrorDialog(context, "¡Digite un email valido!");
+                      return;
+                    }
+                    try {
+                      await supabase.auth.updateUser(
+                        UserAttributes(
+                        email: nuevoParametro,
+                        ),
+                        emailRedirectTo: 'io.supabase.flutterquickstart://login-callback/'
+                      );
+                    } catch (e) {
+                      showCustomErrorDialog(context, 'Error al actualizar el correo');
+                      return;
+                    }
+                    await supabase
+                      .from('empleado')
+                      .update({'correo_electronico': nuevoParametro})
+                      .match({'user_name': userNameController.text });
+                    cargarDatos();
+                    Navigator.of(context).pop();
+                  }
+                  else {
+                    return;
+                  }
+                } catch (e) {
+                  showCustomErrorDialog(context,e.toString());
+                }
+              },
+              child: const Text('Actualizar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  bool validarEmail(String email) {
+    final RegExp regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return regex.hasMatch(email);
   }
 
   Future<void> actualizarScroll(String parametro) async {
