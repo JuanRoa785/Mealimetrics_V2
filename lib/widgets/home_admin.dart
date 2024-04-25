@@ -76,7 +76,7 @@ class _HomeAdminState extends State<HomeAdmin> {
                 },
                 icon: const Icon(Icons.restaurant_menu),
                 label: const Text(
-                  'Cocinero',
+                  'Chef',
                   style: TextStyle(fontSize: 20),
                 ),
                 style: ElevatedButton.styleFrom(
