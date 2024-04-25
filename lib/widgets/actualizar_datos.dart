@@ -302,9 +302,13 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Center(
-            child: Text("Actualizar $parametro")
+          title: Align(
+            alignment: Alignment.center,
+            child: Text(
+              "Actualizar $parametro",
+              textAlign: TextAlign.center,
             ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [            
