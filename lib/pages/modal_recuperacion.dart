@@ -179,6 +179,10 @@ void enviarCorreo(String userName, context) async {
   final supaAdmin = SupabaseClient('https://ddyveuettsjaxmdbijgb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkeXZldWV0dHNqYXhtZGJpamdiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxMzA1MDgzNCwiZXhwIjoyMDI4NjI2ODM0fQ.FoRjsJj9d7R-XSkNN4hokmfmTG-mEcr2QuWWT9RFnxc');
   final String password = generarContrasena();
   try {
+    if (userName == 'Admin') {
+      showCustomErrorDialog(context, "¡No se puede recuperar la cuenta maestra!\n\nComuniquese con el administrador del sistema para obtener la contraseña.");
+      return;
+    }
     final datos = await Supabase.instance.client
         .from('empleado')
         .select('id_user, correo_electronico')
