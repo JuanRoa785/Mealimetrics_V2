@@ -491,6 +491,11 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
   }
   
   Future<void> actualizarPassword() async {
+    if (userNameController.text == 'Admin') {
+      showCustomErrorDialog(
+          context, "¡La cuenta Admin NO puede ser actualizada!");
+      return;
+    }
     await showDialog(
       context: context,
       builder: (BuildContext context) {
