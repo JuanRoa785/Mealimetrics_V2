@@ -34,7 +34,12 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Actualizar Datos'),
+        title: const 
+        Text('Actualizar Datos',
+          style: TextStyle(
+            fontWeight: FontWeight.bold
+            )
+          ),
         backgroundColor: const Color.fromARGB(255, 111, 209, 254),
       ),
       body: SingleChildScrollView(

@@ -180,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
         case 'Mesero':
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeMesero()));
           break;
-        case 'Encargado De Cocina':
+        case 'Chef':
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeChef()));
           break;
         case 'Admin':

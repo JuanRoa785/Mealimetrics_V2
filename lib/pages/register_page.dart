@@ -10,7 +10,7 @@ class RegisterPage extends StatefulWidget {
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
-List<String> listaRoles = ['Gerente', 'Mesero', 'Encargado De Cocina'];
+List<String> listaRoles = ['Gerente', 'Mesero', 'Chef'];
 List<String> listaTipoDocumento = ['C.C', 'C.E', 'R.C', 'T.I'];
 String dropdownValueR = listaRoles.first;
 String dropdownValueTD = listaTipoDocumento.first;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:mealimetrics/widgets/custom_alert.dart';
+import 'package:flutterflow_ui/flutterflow_ui.dart';
 
 class ModalRecuperacionWidget extends StatefulWidget {
   const ModalRecuperacionWidget({super.key});
@@ -127,27 +128,32 @@ class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
                 const SizedBox(height: 16),
                 Align(
                   alignment: Alignment.center,
-                  child: ElevatedButton(
+                  child: 
+                  FFButtonWidget(
                     onPressed: () {
                       final userName = _emailAddressController.text;
                       enviarCorreo(userName, context);
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                    child: const Text(
-                      'Enviar Correo',
-                      style: TextStyle(
-                        fontFamily: 'Readex Pro',
-                        color: Colors.white,
-                        fontSize: 16,
-                        letterSpacing: 0,
-                        fontWeight: FontWeight.w500,
+                    text: 'Enviar Correo',
+                    options: FFButtonOptions(
+                      width: 250,
+                      height: 32,
+                      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                      iconPadding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                      color: const Color.fromARGB(255, 4, 88, 254),
+                      textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                            fontFamily: 'Plus Jakarta Sans',
+                            color: Colors.white,
+                            fontSize: 17,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                      elevation: 3,
+                      borderSide: const BorderSide(
+                        color: Colors.transparent,
+                        width: 1,
                       ),
+                      borderRadius: BorderRadius.circular(40),
                     ),
                   ),
                 ),

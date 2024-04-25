@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mealimetrics/widgets/home_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';
+import 'package:mealimetrics/pages/gestion_empleados.dart';
 
 class HomeGerente extends StatefulWidget {
   const HomeGerente({super.key});
@@ -12,6 +13,7 @@ class HomeGerente extends StatefulWidget {
 
 class _HomeGerenteState extends State<HomeGerente> {
   final supabase = Supabase.instance.client;
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +49,36 @@ class _HomeGerenteState extends State<HomeGerente> {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            
-          ],
-        ),
+        child: _selectedIndex == 0
+            ? const GestionEmpleados() 
+            : _selectedIndex == 1
+              ? const Text('Contenido de la página 2')
+              : const Text('Contenido de la página 3'), 
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.lock_person_outlined, size: 30),
+            label: 'Empleados',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart_outlined, size: 30),
+            label: 'Estadísticas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.no_food_outlined, size: 30),
+            label: 'Menú',
+          ),
+        ],
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        selectedFontSize: 20,
+        unselectedFontSize: 20,
       ),
     );
   }
