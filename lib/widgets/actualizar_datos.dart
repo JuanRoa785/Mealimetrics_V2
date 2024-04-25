@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
+import 'package:intl/intl.dart';
 
 class ActualizarDatos extends StatefulWidget {
   const ActualizarDatos({super.key});
@@ -65,7 +66,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
               _buildTextFieldWithButton(
                 labelText: "Fecha de nacimiento",
                 controller: fechaNacimientoController,
-                parametro: "Fecha de Nacimiento",
+                parametro: "fecha de nacimiento",
                 onPressed: actualizarFechaNac,
               ),
               const SizedBox(height: 18.0),
@@ -124,6 +125,8 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
   }
 
   Future<void> actualizarTexto(String parametro) async {
+    final User? user = supabase.auth.currentUser;
+    final idUser = user?.id;
     final TextEditingController newDataController = TextEditingController();
 
     await showDialog(
@@ -165,12 +168,23 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
                     cargarDatos();
                     Navigator.of(context).pop();
                   }
+
+                  else if (parametro == "Usuario (Login)") {
+                    await supabase
+                    .from('empleado')
+                    .update({'user_name': nuevoParametro})
+                    .match({'id_user': idUser as Object});
+                    cargarDatos();
+                    Navigator.of(context).pop();
+                  } 
+
                   else if (parametro == "Numero de documento"){
                     if (nuevoParametro.contains(RegExp(r'[a-zA-Z]'))){
                       showCustomErrorDialog(context, '¡El documento solo debe contener números!');
                       return;
                     }
-                    else{
+                    
+                    else {
                       await supabase
                         .from('persona')
                         .update({'numero_documento': nuevoParametro})
@@ -179,6 +193,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
                       Navigator.of(context).pop();
                     }
                   }
+                   
                 } catch (e) {
                   showCustomErrorDialog(context,e.toString());
                 }
@@ -309,20 +324,42 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
   }
 
   Future<void> actualizarFechaNac(String parametro) async {
-    final TextEditingController newNameController = TextEditingController();
+    final TextEditingController newDate = TextEditingController();
 
     await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Actualizar $parametro"),
+          title: Align(
+          alignment: Alignment.center,
+          child: Text(
+            "Actualizar $parametro",
+            textAlign: TextAlign.center,
+          ),
+        ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              
               TextField(
-                controller: newNameController,
-                decoration: const InputDecoration(labelText: 'Nueva Fecha'),
-              ),
+                  readOnly: true,
+                  controller: newDate,
+                  decoration: const InputDecoration(
+                      icon: Icon(Icons.calendar_today_rounded),
+                      labelText: "Select Date"), // InputDecoration
+                  onTap: () async {
+                    DateTime? pickeddate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(1980),
+                        lastDate: DateTime(2050));
+                    if (pickeddate != null) {
+                      setState(() {
+                        newDate.text =
+                            DateFormat("yyyy-MM-dd").format(pickeddate);
+                      });
+                    }
+                  })
             ],
           ),
           actions: <Widget>[
@@ -333,12 +370,17 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
               child: const Text('Cancelar'),
             ),
             ElevatedButton(
-              onPressed: () {
-                // Aquí puedes agregar la lógica para actualizar el nombre con el valor en _newNameController.text
-                // Por ejemplo:
-                String nuevoNombre = newNameController.text;
-                Navigator.of(context)
-                    .pop(); // Cierra el modal después de actualizar
+              onPressed: () async {
+                try{
+                 await supabase
+                    .from('persona')
+                    .update({'fecha_nacimiento': newDate.text})
+                    .match({'numero_documento': numeroDocumentoController.text});
+                    cargarDatos();
+                    Navigator.of(context).pop();
+                } catch (e) {
+                  showCustomErrorDialog(context,e.toString());
+                }
               },
               child: const Text('Actualizar'),
             ),
