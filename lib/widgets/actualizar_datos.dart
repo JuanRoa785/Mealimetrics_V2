@@ -1,9 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
-import 'package:intl/intl.dart';
+//import 'package:intl/intl.dart';
 
 class ActualizarDatos extends StatefulWidget {
   const ActualizarDatos({super.key});
@@ -42,6 +43,14 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+               Container(
+              alignment: Alignment.center,
+              child: const Icon(
+                Icons.account_circle_sharp,
+                size: 120,
+                color: Color.fromARGB(255, 4, 88, 254),
+              ),
+            ),
               _buildTextFieldWithButton(
                 labelText: "Nombre Completo",
                 controller: nameController,
@@ -89,12 +98,37 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
                 parametro: "Usuario (Login)",
                 controller: userNameController,
                 onPressed: actualizarTexto,
+              ),
+              const SizedBox(height: 35.0),
+              FFButtonWidget(
+                onPressed: () => actualizarPassword(),
+                text: 'Actualizar Contraseña',
+                options: FFButtonOptions(
+                  width: 230,
+                  height: 42,
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                  iconPadding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                  color: const Color.fromARGB(255, 4, 88, 254),
+                  textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                        fontFamily: 'Plus Jakarta Sans',
+                        color: Colors.white,
+                        fontSize: 16,
+                        letterSpacing: 0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                  elevation: 3,
+                  borderSide: const BorderSide(
+                    color: Colors.transparent,
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(40),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
-    ),
-  ),
-);
+    );
   }
 
   Widget _buildTextFieldWithButton({
@@ -117,7 +151,14 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
         ),
         const SizedBox(width: 10), // Añade un espacio entre el TextField y el botón
         ElevatedButton(
-          onPressed: () => onPressed(parametro),
+          onPressed: () => {
+            if(userNameController.text == 'Admin'){
+              showCustomErrorDialog(context, "¡La cuenta Admin NO puede ser actualizada!")
+            }
+            else{
+              onPressed(parametro)
+            }
+          },
           child: const Icon(Icons.update), // Puedes cambiar el icono o el texto según prefieras
         ),
       ],
@@ -133,8 +174,12 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Center(
-            child: Text("Actualizar $parametro"),
+          title: Align(
+            alignment: Alignment.center,
+            child: Text(
+              "Actualizar $parametro",
+              textAlign: TextAlign.center,
+            ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -439,6 +484,15 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       },
     );
   }
+  
+  Future<void> actualizarPassword() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return const PasswordDialog();
+      },
+    );
+  }
 
   Future<void> cargarDatos() async {
     final User? user = supabase.auth.currentUser;
@@ -477,3 +531,79 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
     emailController.text = datosEmpleado[0]["correo_electronico"] ;
   }
 }
+
+//Clase auxiliar para poder mostrar y esconder la nueva contraseña
+class PasswordDialog extends StatefulWidget {
+  const PasswordDialog({super.key});
+
+  @override
+  PasswordDialogState createState() => PasswordDialogState();
+}
+
+class PasswordDialogState extends State<PasswordDialog> {
+  bool obscureText = true;
+  TextEditingController passwordController = TextEditingController();
+  final supabase = Supabase.instance.client;
+  
+  @override
+  Widget build(BuildContext context) {
+      return AlertDialog(
+        title: const Align(
+          alignment: Alignment.center,
+          child: Text(
+            "Actualizar Contraseña",
+            textAlign: TextAlign.center,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: passwordController,
+              obscureText: obscureText,
+              decoration: InputDecoration(
+                labelText: 'Nueva Contraseña',
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      obscureText = !obscureText;
+                    });
+                  },
+                  child: Icon(
+                    obscureText ? Icons.visibility : Icons.visibility_off,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Cierra el modal
+            },
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (passwordController.text.trim().length < 6) {
+                showCustomErrorDialog(context, "¡La contraseña debe tener minimo 6 caracteres!");
+                return;
+              }
+              try {
+                  await supabase.auth.updateUser(
+                    UserAttributes(
+                    password: passwordController.text,
+                    ),
+                  );
+                  showCustomExitDialog(context, "Actualización exitosa");
+              } catch (e) {
+                showCustomErrorDialog(context, e.toString());
+              }
+            },
+            child: const Text('Actualizar'),
+          ),
+        ],
+      );
+    }
+  }

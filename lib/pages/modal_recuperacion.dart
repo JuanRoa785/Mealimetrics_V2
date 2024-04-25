@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -159,14 +160,42 @@ class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
   }
 }
 
+String generarContrasena(){
+  const String caracteres = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const int longMin = 6;
+  const int longMax = 12;
+  Random random = Random();
+  int longitud = longMin + random.nextInt(longMax - longMin + 1);
+  String contrasena = '';
+  for (int i = 0; i < longitud; i++) {
+    int indice = random.nextInt(caracteres.length);
+    contrasena += caracteres[indice];
+  }
+  return contrasena;
+}
+
 void enviarCorreo(String userName, context) async {
+  //Estos datos solo se muestran en desarrollo, a nivel de producción deben ser encriptados
+  final supaAdmin = SupabaseClient('https://ddyveuettsjaxmdbijgb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkeXZldWV0dHNqYXhtZGJpamdiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxMzA1MDgzNCwiZXhwIjoyMDI4NjI2ODM0fQ.FoRjsJj9d7R-XSkNN4hokmfmTG-mEcr2QuWWT9RFnxc');
+  final String password = generarContrasena();
   try {
     final datos = await Supabase.instance.client
         .from('empleado')
         .select('id_user, correo_electronico')
         .eq("user_name", userName);
-
     if (datos.length == 1) {
+      try {
+        await supaAdmin.auth.admin.updateUserById(
+          datos[0]['id_user'],
+          attributes: AdminUserAttributes(
+            password: password,
+          ),
+        );
+      } catch (e) {
+        showCustomErrorDialog(context, e.toString());
+        return;
+      }
+
       //Enviar el Correo
       final correoAEnviar = datos[0]['correo_electronico'].toString();
       final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
@@ -181,7 +210,7 @@ void enviarCorreo(String userName, context) async {
             "user_id": userId,
             "template_params": {
               "email_to": correoAEnviar,
-              "password": datos[0]['contrasena'].toString()
+              "password": password
             }
           }));
       if (response.statusCode == 200) {
