@@ -159,9 +159,9 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
                   }
                   if (parametro == "Nombre") {
                     await supabase
-                    .from('persona')
-                    .update({'nombre_completo': nuevoParametro})
-                    .match({'numero_documento': numeroDocumentoController.text});
+                      .from('persona')
+                      .update({'nombre_completo': nuevoParametro})
+                      .match({'numero_documento': numeroDocumentoController.text});
                     cargarDatos();
                     Navigator.of(context).pop();
                   }
@@ -269,20 +269,51 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
   }
 
   Future<void> actualizarScroll(String parametro) async {
-    final TextEditingController newNameController = TextEditingController();
-
+    final Map<String, int> tipoDocumentoDic = {'C.C': 1, 'C.E': 2, 'R.C': 3, 'T.I': 4,};
+    final Map<String, int> generoDic = {'Masculino': 1, 'Femenino': 2, 'Hemafrodita': 3, 'N.A': 4,};
+    final List<String> listaGenero = ['Masculino', 'Femenino', 'Hemafrodita', 'N.A'];
+    final List<String> listaTd = ['C.C', 'C.E', 'R.C', 'T.I'];
+    List<String> lista;
+    String dropdownValue;
+    if(parametro == 'Genero'){
+      lista = listaGenero;
+    }
+    else{
+      lista = listaTd;
+    }
+    dropdownValue = lista.first;
+    
     await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Actualizar $parametro"),
+          title: Center(
+            child: Text("Actualizar $parametro")
+            ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: newNameController,
-                decoration: const InputDecoration(labelText: 'Nuevo Valor'),
-              ),
+            children: [            
+                DropdownButtonFormField<String>(
+                  decoration:InputDecoration(
+                    labelText: parametro,
+                  ),
+                  value: dropdownValue,
+                  onChanged: (String? value) {
+                    setState(() {
+                      dropdownValue = value!;
+                    });
+                  },
+                  items: lista.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                          )),
+                    );
+                  }).toList(),
+                ),
             ],
           ),
           actions: <Widget>[
@@ -293,12 +324,27 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
               child: const Text('Cancelar'),
             ),
             ElevatedButton(
-              onPressed: () {
-                // Aquí puedes agregar la lógica para actualizar el nombre con el valor en _newNameController.text
-                // Por ejemplo:
-                String nuevoNombre = newNameController.text;
-                Navigator.of(context)
-                    .pop(); // Cierra el modal después de actualizar
+              onPressed: () async {
+                try {
+                  if (parametro == 'Genero') {
+                    await supabase
+                      .from('persona')
+                      .update({'id_sexo': generoDic[dropdownValue]})
+                      .match({'numero_documento': numeroDocumentoController.text});
+                    cargarDatos();
+                    Navigator.of(context).pop();
+                  }
+                  else if (parametro == 'Tipo de Documento'){
+                    await supabase
+                      .from('persona')
+                      .update({'id_tipo_documento': tipoDocumentoDic[dropdownValue]})
+                      .match({'numero_documento': numeroDocumentoController.text});
+                    cargarDatos();
+                    Navigator.of(context).pop();
+                  }
+                } catch (e) {
+                  showCustomErrorDialog(context, e.toString());
+                }// Cierra el modal después de actualizar
               },
               child: const Text('Actualizar'),
             ),
