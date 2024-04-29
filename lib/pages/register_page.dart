@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'package:mealimetrics/Styles/color_scheme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 
@@ -28,7 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 126, 227, 252),
+        backgroundColor: EsquemaDeColores.backgroundSecondary,
         body: Center(
           child: SingleChildScrollView(
             child: Column(
@@ -106,6 +107,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 dropdownValueR = value!;
                               });
                             },
+                            dropdownColor: Colors.white,
                             items: listaRoles.map((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
@@ -246,6 +248,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   dropdownValueTD = value!;
                 });
               },
+              dropdownColor: Colors.white,
               items: listaTipoDocumento.map((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -499,6 +502,7 @@ class _TextFieldGeneralState extends State<_TextFieldGeneral> {
         prefixIcon: Icon(widget.icon),
         labelText: widget.labelText,
         hintText: widget.hintText,
+        border: InputBorder.none,
         suffixIcon: GestureDetector(
           onTap: () {
             setState(() {
@@ -516,6 +520,7 @@ class _TextFieldGeneralState extends State<_TextFieldGeneral> {
         prefixIcon: Icon(widget.icon),
         labelText: widget.labelText,
         hintText: widget.hintText,
+        border: InputBorder.none
       );
     }
   }

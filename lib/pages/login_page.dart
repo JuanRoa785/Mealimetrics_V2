@@ -9,6 +9,7 @@ import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mealimetrics/widgets/home_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
+import 'package:mealimetrics/Styles/color_scheme.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -33,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 126, 227, 252),
+        backgroundColor: EsquemaDeColores.backgroundSecondary,
         body: Center(
           child: SingleChildScrollView(
             child: Column(
@@ -46,9 +47,9 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: EdgeInsets.only(left: 10.0, right: 10.0),
                     child: Align(
-                      alignment: Alignment.topLeft,
+                      alignment: Alignment.center,
                       child: Text(
-                        "Bienvenido de vuelta",
+                        "¡Bienvenido de vuelta!",
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 25,
@@ -59,6 +60,23 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   SizedBox(
                     height: 15.0,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        "Digite sus credenciales:",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10.0,
                   ),
                   _textFieldUserName(),
                   SizedBox(
@@ -108,8 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                             return Center(
                               child: SizedBox(
                                 width: MediaQuery.of(context).size.width * 0.9,
-                                height: MediaQuery.of(context).size.height *
-                                    0.6, // Ajusta el ancho según tu preferencia
+                                height: MediaQuery.of(context).size.height *0.5, // Ajusta el ancho según tu preferencia
                                 child: Card(
                                   child: ModalRecuperacionWidget(),
                                 ),
@@ -310,6 +327,7 @@ class _TextFieldGeneralState extends State<_TextFieldGeneral> {
         prefixIcon: Icon(widget.icon),
         labelText: widget.labelText,
         hintText: widget.hintText,
+        border: InputBorder.none,
         suffixIcon: GestureDetector(
           onTap: () {
             setState(() {
@@ -327,6 +345,7 @@ class _TextFieldGeneralState extends State<_TextFieldGeneral> {
         prefixIcon: Icon(widget.icon),
         labelText: widget.labelText,
         hintText: widget.hintText,
+        border: InputBorder.none
       );
     }
   }

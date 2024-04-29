@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mealimetrics/Styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/home_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';
@@ -19,7 +20,7 @@ class _HomeGerenteState extends State<HomeGerente> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 111, 209, 254),
+        backgroundColor: EsquemaDeColores.backgroundSecondary,
         title: const Text(
           'Home Gerente',
           style: TextStyle(fontSize: 25,

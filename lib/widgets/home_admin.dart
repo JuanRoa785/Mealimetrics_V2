@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mealimetrics/pages/home_chef.dart';
 import 'package:mealimetrics/pages/home_gerente.dart';
 import 'package:mealimetrics/pages/home_mesero.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';
 
@@ -18,6 +19,7 @@ class _HomeAdminState extends State<HomeAdmin> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: EsquemaDeColores.backgroundSecondary,
         title: const Text(
           'Home Admin',
           style: TextStyle(

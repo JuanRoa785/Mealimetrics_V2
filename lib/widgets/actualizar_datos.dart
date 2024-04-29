@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 //import 'package:intl/intl.dart';
@@ -37,10 +38,11 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
         title: const 
         Text('Actualizar Datos',
           style: TextStyle(
+            fontSize: 25,
             fontWeight: FontWeight.bold
             )
           ),
-        backgroundColor: const Color.fromARGB(255, 111, 209, 254),
+        backgroundColor: EsquemaDeColores.backgroundSecondary,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -179,6 +181,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: EsquemaDeColores.background,
           title: Align(
             alignment: Alignment.center,
             child: Text(
@@ -233,7 +236,6 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
                       showCustomErrorDialog(context, '¡El documento solo debe contener números!');
                       return;
                     }
-                    
                     else {
                       await supabase
                         .from('persona')
@@ -243,7 +245,6 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
                       Navigator.of(context).pop();
                     }
                   }
-                   
                 } catch (e) {
                   showCustomErrorDialog(context,e.toString());
                 }
@@ -263,6 +264,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: EsquemaDeColores.background,
           title: Center(
             child: Text("Actualizar $parametro"),
           ),
@@ -352,6 +354,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: EsquemaDeColores.background,
           title: Align(
             alignment: Alignment.center,
             child: Text(
@@ -372,6 +375,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
                       dropdownValue = value!;
                     });
                   },
+                  dropdownColor: EsquemaDeColores.background,
                   items: lista.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -430,6 +434,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: EsquemaDeColores.background,
           title: Align(
           alignment: Alignment.center,
           child: Text(
@@ -558,6 +563,7 @@ class PasswordDialogState extends State<PasswordDialog> {
   @override
   Widget build(BuildContext context) {
       return AlertDialog(
+        backgroundColor: EsquemaDeColores.background,
         title: const Align(
           alignment: Alignment.center,
           child: Text(

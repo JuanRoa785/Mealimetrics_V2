@@ -33,7 +33,7 @@ class CustomAlertDialog extends StatelessWidget {
       content: Text(
         message,
         textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 20),
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       actions: [
         TextButton(

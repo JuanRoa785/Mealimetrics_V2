@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mealimetrics/pages/login_page.dart';
 import 'package:mealimetrics/pages/register_page.dart';
+import 'package:mealimetrics/Styles/color_scheme.dart';
 
 class Home extends StatefulWidget{
   
@@ -20,13 +21,13 @@ class _HomeState extends State<Home> {
         title: const Text(
           "MealiMetrics",
           style: TextStyle(
-            color: Color.fromARGB(255, 234, 255, 1),
+            color: EsquemaDeColores.primary,
             fontSize: 40,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true, // Centra el título
-        backgroundColor:const Color.fromARGB(255, 126, 227, 252),
+        backgroundColor: EsquemaDeColores.backgroundSecondary,
       ),
       body: Center(
         child: _selectedIndex == 0

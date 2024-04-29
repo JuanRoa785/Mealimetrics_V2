@@ -1,7 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -49,33 +51,68 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
 
   Widget _buildEmpleadoCard(Map<String, dynamic> empleado) {
     return Card(
+      color: EsquemaDeColores.secondary,
       margin: const EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0),
       child: Column(
         children: [
           ListTile(
-            title: Text(
-              'Usuario: ${empleado['user_name']}',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+            title: RichText(
+              text: TextSpan(
+                text: 'Usuario: ',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: EsquemaDeColores.onSecondary,
+                ),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: empleado['user_name'],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 19,
+                      color: EsquemaDeColores.onPrimary, // Puedes personalizar el estilo aquí
+                    ),
+                  ),
+                ],
+              ),
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 8.0),
-                Text(
-                  'Email: ${empleado['correo_electronico']}',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 17),
+                RichText(
+                  text: TextSpan(
+                    text: 'Email: ',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: EsquemaDeColores.onSecondary,
+                    ),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: empleado['correo_electronico'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 19,
+                          color: EsquemaDeColores.onPrimary, // Puedes personalizar el estilo aquí
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
                       'Estado:',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                      style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 17
+                          ),
                     ),
                     DropdownButton<String>(
                       value: empleado['estado_cuenta'],
+                      dropdownColor: EsquemaDeColores.secondary,
                       onChanged: (newValue) {
                         setState(() {
                           empleado['estado_cuenta'] = newValue!;
@@ -84,7 +121,10 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                       items: estados.map((estado) {
                         return DropdownMenuItem<String>(
                           value: estado,
-                          child: Text(estado),
+                          child: Text(estado, style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.normal
+                            )
+                          ),
                         );
                       }).toList(),
                     ),
@@ -95,6 +135,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                     ),
                     DropdownButton<String>(
                       value: empleado['rol'],
+                      dropdownColor: EsquemaDeColores.secondary,
                       onChanged: (newValue) {
                         setState(() {
                           empleado['rol'] = newValue!;
@@ -103,7 +144,10 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                       items: roles.map((rol) {
                         return DropdownMenuItem<String>(
                           value: rol,
-                          child: Text(rol),
+                          child: Text(rol, style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.normal
+                            )
+                          ),
                         );
                       }).toList(),
                     ),

@@ -58,9 +58,9 @@ class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
                         style: TextStyle(
                           fontFamily: 'Outfit',
                           color: Color(0xFF14181B),
-                          fontSize: 24,
+                          fontSize: 25,
                           letterSpacing: 0,
-                          fontWeight: FontWeight.normal,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -73,12 +73,12 @@ class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 10),
                 const Text(
                   'No te preocupes, digita tu usuario a continuación:',
                   style: TextStyle(
                     fontFamily: 'Readex Pro',
-                    color: Color(0xFF57636C),
+                    color: Colors.black,
                     fontSize: 18,
                     letterSpacing: 0,
                     fontWeight: FontWeight.normal,
@@ -93,23 +93,23 @@ class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
                     labelText: 'Usuario',
                     labelStyle: const TextStyle(
                       fontFamily: 'Plus Jakarta Sans',
-                      color: Color(0xFF57636C),
+                      color: Colors.black,
                       fontSize: 16,
                       letterSpacing: 0,
                       fontWeight: FontWeight.w500,
                     ),
                     hintText: 'Digite su usuario',
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(40),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(40),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(40),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     focusedErrorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(40),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     filled: true,
                     fillColor: Colors.white,
@@ -125,7 +125,7 @@ class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
                   ),
                   keyboardType: TextInputType.emailAddress,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 Align(
                   alignment: Alignment.center,
                   child: 
@@ -137,7 +137,7 @@ class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
                     text: 'Enviar Correo',
                     options: FFButtonOptions(
                       width: 250,
-                      height: 32,
+                      height: 40,
                       padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                       iconPadding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                       color: const Color.fromARGB(255, 4, 88, 254),
