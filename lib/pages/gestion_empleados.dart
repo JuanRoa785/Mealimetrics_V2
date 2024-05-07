@@ -52,8 +52,6 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
         .neq("user_name", "Admin")
         .or('user_name.ilike.%$filtro%, correo_electronico.ilike.%$filtro%');
     }    
-    
-
     setState(() {
       empleados = data;
     });
