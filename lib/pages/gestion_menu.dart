@@ -78,7 +78,6 @@ class _GestionMenuState extends State<GestionMenu>{
   }
 
   Widget _buildTabContent(List<Map<String, dynamic>> platillos) {
-    cargarPlatillos();
     return Column(
       children: [
         Container(
