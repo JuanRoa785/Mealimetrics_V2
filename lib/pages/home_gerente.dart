@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mealimetrics/Styles/color_scheme.dart';
+import 'package:mealimetrics/pages/gestion_menu.dart';
 import 'package:mealimetrics/widgets/home_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';
@@ -49,12 +50,13 @@ class _HomeGerenteState extends State<HomeGerente> {
           ),
         ],
       ),
-      body: Center(
-        child: _selectedIndex == 0
-            ? const GestionEmpleados() 
-            : _selectedIndex == 1
-              ? const Text('Contenido de la página 2')
-              : const Text('Contenido de la página 3'), 
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: const [
+          GestionEmpleados(),
+          Center(child: Text('Contenido de la página 2')),
+          GestionMenu(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
