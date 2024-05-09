@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 //import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mealimetrics/styles/color_scheme.dart';
+import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class GestionMenu extends StatefulWidget {
@@ -68,16 +71,16 @@ class _GestionMenuState extends State<GestionMenu>{
         ),
       body: TabBarView(
           children: [
-            _buildTabContent(principios),
-            _buildTabContent(platillos),
-            _buildTabContent(complementos)
+            _buildTabContent(principios, 'principios'),
+            _buildTabContent(platillos, 'seco'),
+            _buildTabContent(complementos, 'complementos')
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTabContent(List<Map<String, dynamic>> platillos) {
+  Widget _buildTabContent(List<Map<String, dynamic>> platos, String filtro) {
     return Column(
       children: [
         Container(
@@ -107,7 +110,74 @@ class _GestionMenuState extends State<GestionMenu>{
               Padding(
               padding: const EdgeInsets.only(left: 10),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  final String nombre = platilloController.text.trim();
+                  if (nombre == '') {
+                    showCustomErrorDialog(context, '¡Digite una palabra clave en el buscador!');
+                    cargarPlatillos();
+                    return;
+                  }
+                  List<Map<String, dynamic>> platillosFiltrados;
+                   switch (filtro) {
+                     case 'principios':
+                        platillosFiltrados = await supabase
+                          .from('Platillo')
+                          .select()
+                          .eq('categoria_alimenticia', 'Principio')
+                          .ilike('nombre', '%$nombre%');
+                        
+                        if(platillosFiltrados.isEmpty){
+                          showCustomErrorDialog(context, "¡No hay ningun plato que tenga en su nombre: '$nombre'!");
+                          cargarPlatillos();
+                          platilloController.clear();
+                          return;
+                        }
+
+                        setState(() {
+                           principios = platillosFiltrados;
+                        });
+                        break;
+
+                      case 'seco':
+                        platillosFiltrados = await supabase
+                          .from('Platillo')
+                          .select()
+                          .eq('categoria_alimenticia', 'Seco')
+                          .ilike('nombre', '%$nombre%');
+                        
+                        if(platillosFiltrados.isEmpty){
+                          showCustomErrorDialog(context, "¡No hay ningun plato que tenga en su nombre: '$nombre'!");
+                          cargarPlatillos();
+                          platilloController.clear();
+                          return;
+                        }
+
+                        setState(() {
+                           platillos = platillosFiltrados; 
+                        });
+                        break; 
+
+                     case 'complementos':
+                        platillosFiltrados = await supabase
+                          .from('Platillo')
+                          .select()
+                          .or('categoria_alimenticia.eq.Bebida, categoria_alimenticia.eq.Sopa')
+                          .ilike('nombre', '%$nombre%');
+                        
+                        if(platillosFiltrados.isEmpty){
+                          showCustomErrorDialog(context, "¡No hay ningun plato que tenga en su nombre: '$nombre'!");
+                          cargarPlatillos();
+                          platilloController.clear();
+                          return;
+                        }
+
+                        setState(() {
+                           complementos = platillosFiltrados; // Actualizar la lista de platillos
+                        });  
+                        break; 
+                     default:
+                   }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: EsquemaDeColores.background,
                   shape: RoundedRectangleBorder(
@@ -163,7 +233,7 @@ class _GestionMenuState extends State<GestionMenu>{
           ),
         ),
         Expanded(
-          child: _buildPlatillosList(platillos),
+          child: _buildPlatillosList(platos),
         ),
       ],
     );
