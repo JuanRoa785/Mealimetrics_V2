@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-//import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -34,7 +33,7 @@ class _GestionMenuState extends State<GestionMenu>{
     final dataPrinc = await supabase
                   .from('Platillo')
                   .select()
-                  .eq('categoria_alimenticia', 'Principio');
+                  .or('categoria_alimenticia.eq.Principio, categoria_alimenticia.eq.Complemento');
 
     final dataComp = await supabase
                   .from('Platillo')
@@ -73,7 +72,7 @@ class _GestionMenuState extends State<GestionMenu>{
           children: [
             _buildTabContent(principios, 'principios'),
             _buildTabContent(platillos, 'seco'),
-            _buildTabContent(complementos, 'complementos')
+            _buildTabContent(complementos, 'bebidas')
           ],
         ),
       ),
@@ -123,7 +122,7 @@ class _GestionMenuState extends State<GestionMenu>{
                         platillosFiltrados = await supabase
                           .from('Platillo')
                           .select()
-                          .eq('categoria_alimenticia', 'Principio')
+                          .or('categoria_alimenticia.eq.Principio, categoria_alimenticia.eq.Complemento')
                           .ilike('nombre', '%$nombre%');
                         
                         if(platillosFiltrados.isEmpty){
@@ -157,7 +156,7 @@ class _GestionMenuState extends State<GestionMenu>{
                         });
                         break; 
 
-                     case 'complementos':
+                     case 'bebidas':
                         platillosFiltrados = await supabase
                           .from('Platillo')
                           .select()
@@ -197,31 +196,13 @@ class _GestionMenuState extends State<GestionMenu>{
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    // Lógica para crear un nuevo platillo
+                    crearPlatillo();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                   ),
                   child: const Text(
                     'Agregar',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 20), // Espacio entre los botones
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Lógica para eliminar un platillo
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
-                  child: const Text(
-                    'Eliminar',
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.white,
@@ -266,7 +247,7 @@ class _GestionMenuState extends State<GestionMenu>{
                 ),
               ),
             ),
-          // Columna derecha (Nombre, Descripción, Precio)
+          
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 15.0, top: 10.0, bottom: 10.0),
@@ -292,7 +273,6 @@ class _GestionMenuState extends State<GestionMenu>{
                     textAlign: TextAlign.justify
                   ),
                   const SizedBox(height: 5),
-                  // Precio del platillo
                   RichText(
                   text: TextSpan(
                     text: 'Precio: ',
@@ -307,11 +287,39 @@ class _GestionMenuState extends State<GestionMenu>{
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 19,
-                          color: Colors.green // Puedes personalizar el estilo aquí
+                          color: Colors.green 
                         ),
                       ),
                     ],
                   ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Lógica para ACTUALIZAR un platillo
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: EsquemaDeColores.secondary,
+                        ),
+                        child: const Icon(Icons.update, color: Colors.white, size: 35,)
+                      ),
+                    ),
+                    const SizedBox(width: 20), 
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          eliminarPlatillo(platillo);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: const Icon(Icons.delete_forever, color: Colors.white, size: 35,)
+                      ),
+                    ),
+                  ],
                 ),
                 ],
               ),
@@ -322,6 +330,269 @@ class _GestionMenuState extends State<GestionMenu>{
     );
   }
 
+  Future<void> crearPlatillo() async {
+    String nombre = '';
+    String descripcion = '';
+    String precio = '';
+    List<String> listaCategorias = ['Seco', 'Principio', 'Bebida', 'Sopa', 'Complemento'];
+    String categoria = listaCategorias.first; // Categoría por defecto
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Crear Platillo",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 28,
+                color: Colors.green,
+              ),
+              textAlign: TextAlign.center),
+          contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return SingleChildScrollView(
+                child:  Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      decoration: const InputDecoration(
+                        labelText: 'Nombre',
+                        labelStyle: TextStyle(
+                          color: EsquemaDeColores.primary,
+                          fontSize: 18,
+                        ),
+                      ),
+                      onChanged: (value) {
+                        nombre = value;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      maxLines: null, // Para permitir múltiples líneas
+                      decoration: const InputDecoration(
+                        labelText: 'Descripción',
+                        labelStyle: TextStyle(
+                          color: EsquemaDeColores.primary,
+                          fontSize: 18,
+                        ),
+                      ),
+                      onChanged: (value) {
+                        descripcion = value;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      decoration: const InputDecoration(
+                        labelText: 'Precio',
+                        labelStyle: TextStyle(
+                          color: EsquemaDeColores.primary,
+                          fontSize: 18,
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        precio = value;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        const Text(
+                          'Categoría:',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: EsquemaDeColores.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        DropdownButton<String>(
+                          value: categoria,
+                          icon: const Icon(Icons.arrow_downward),
+                          iconSize: 24,
+                          elevation: 16,
+                          style: const TextStyle(
+                              color: Colors.deepPurple, fontSize: 18),
+                          underline: Container(
+                            height: 2,
+                            color: Colors.deepPurpleAccent,
+                          ),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              categoria = newValue!;
+                            });
+                          },
+                          items: listaCategorias
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  color: EsquemaDeColores.primary,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              );
+            },
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                const SizedBox(height: 15),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Cancelar',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      await supabase.from('Platillo').insert({
+                        'nombre': nombre,
+                        'descripcion': descripcion,
+                        'precio_unitario':
+                            int.parse(precio), // Convertir a entero
+                        'categoria_alimenticia': categoria,
+                      });
+                      Navigator.of(context).pop();
+                      cargarPlatillos();
+                    } catch (e) {
+                      showCustomErrorDialog(context, e.toString());
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Crear',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> eliminarPlatillo(Map<String, dynamic> platillo) async {
+    await showDialog(
+      context:context,
+      builder: (BuildContext context){
+        return AlertDialog(
+          title: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "¿Esta Seguro?",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  color: Colors.red,
+                ),
+              ),     
+            ],
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+          content: Column(
+          mainAxisSize: MainAxisSize.min, 
+          children: [
+            const Text(
+              "Eliminar este platillo es irreversible y su información no podrá ser recuperada.",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 21,
+                color: EsquemaDeColores.onSecondary,
+              ),
+              textAlign: TextAlign.justify,
+            ),
+            const SizedBox(height: 10), 
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  await supabase
+                    .from('Platillo')
+                    .delete()
+                    .match({ 'id': platillo['id'] });
+                  Navigator.of(context).pop();
+                  setState(() {
+                    cargarPlatillos();
+                  });
+                } catch (e) {
+                  showCustomErrorDialog(context, e.toString());
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red, 
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10), 
+                ),
+              ),
+              child: const Text(
+                'Eliminar',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: EsquemaDeColores.onPrimary
+                ),
+              ),
+            ),
+          ],
+        ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'OK',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      }
+    );
+
+
+
+  }
 
 }
 
