@@ -48,12 +48,13 @@ class _HomeGerenteState extends State<HomeGerente> {
           ),
         ],
       ),
-      body: Center(
-        child: _selectedIndex == 0
-            ? const GestionEmpleados()
-            : _selectedIndex == 1
-                ? const Text('Contenido de la página 2')
-                : const GestionMenu(),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: const [
+          GestionEmpleados(),
+          Center(child: Text('Contenido de la página 2')),
+          GestionMenu(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
