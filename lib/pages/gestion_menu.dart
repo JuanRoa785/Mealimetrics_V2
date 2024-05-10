@@ -470,6 +470,18 @@ class _GestionMenuState extends State<GestionMenu>{
                 ),
                 ElevatedButton(
                   onPressed: () async {
+                    if(nombre == '' || descripcion == '' || precio == ''){
+                      showCustomErrorDialog(context, '¡Llene toda la información del platillo!');
+                      return;
+                    }
+
+                    try {
+                      int.parse(precio);
+                    } catch (e) {
+                      showCustomErrorDialog(context, '¡El precio del platillo debe ser un número entero!');
+                      return;
+                    }
+
                     try {
                       await supabase.from('Platillo').insert({
                         'nombre': nombre,
