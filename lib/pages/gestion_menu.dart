@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
@@ -636,7 +635,7 @@ class _GestionMenuState extends State<GestionMenu>{
                   showCustomErrorDialog(context, e.toString());
                   return;
                 }
-                
+
                 //Eliminamos su correspondiente imagen
                 try {
                   await supabase.storage.from('platillos').remove(['IDPlatillo/$idPlatillo/imagenPlatillo']);
@@ -684,9 +683,6 @@ class _GestionMenuState extends State<GestionMenu>{
         );
       }
     );
-
-
-
   }
 
 }
