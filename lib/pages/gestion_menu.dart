@@ -1,9 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 
 class GestionMenu extends StatefulWidget {
   const GestionMenu({super.key});
@@ -231,6 +234,10 @@ class _GestionMenuState extends State<GestionMenu>{
   }
 
   Card buildPlatilloCard(Map<String, dynamic> platillo) {
+    final idPlatillo = platillo['id'];
+    final path = 'IDPlatillo/$idPlatillo/imagenPlatillo';
+    final String imageRoute = supabase.storage.from('platillos').getPublicUrl(path); 
+    //print(imageRoute);
     return Card(
       elevation: 5,
       margin: const EdgeInsets.all(10),
@@ -242,7 +249,7 @@ class _GestionMenuState extends State<GestionMenu>{
                 width: 120,
                 height: 120,
                 child: Image.network(
-                  platillo['imagen'],
+                  imageRoute,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -336,6 +343,7 @@ class _GestionMenuState extends State<GestionMenu>{
     String precio = '';
     List<String> listaCategorias = ['Seco', 'Principio', 'Bebida', 'Sopa', 'Complemento'];
     String categoria = listaCategorias.first; // Categoría por defecto
+    XFile? image;
 
     await showDialog(
       context: context,
@@ -347,7 +355,8 @@ class _GestionMenuState extends State<GestionMenu>{
                 fontSize: 28,
                 color: Colors.green,
               ),
-              textAlign: TextAlign.center),
+              textAlign: TextAlign.center
+          ),
           contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
           content: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
@@ -355,6 +364,56 @@ class _GestionMenuState extends State<GestionMenu>{
                 child:  Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    const SizedBox(height:8),
+                    SizedBox(
+                      width:150,
+                      height:150,
+                      child:  image!=null 
+                      ? Image.file(File(image!.path))
+                      : Container(
+                        color: EsquemaDeColores.primary,
+                        child: const Center(
+                          child: Text('Sin imagen',
+                            style: TextStyle(
+                              color: EsquemaDeColores.onPrimary,
+                              fontSize: 18
+                            ),
+                          )
+                        ),
+                      )
+                    ),
+                    const SizedBox(height: 10,),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final ImagePicker picker = ImagePicker();
+                        final XFile? pickedImage =
+                          await picker.pickImage(source: ImageSource.gallery);
+                        if(pickedImage != null){
+                          setState(() {
+                            image = pickedImage;
+                            }
+                          );
+                        }
+                        else{
+                          return;
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Cargar Imagen',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+
                     TextField(
                       decoration: const InputDecoration(
                         labelText: 'Nombre',
@@ -470,6 +529,7 @@ class _GestionMenuState extends State<GestionMenu>{
                 ),
                 ElevatedButton(
                   onPressed: () async {
+                    //const String defaultRoute = 'https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihaONdadrWYjY7viSH7kaIx2hRjz0TLGG5CepqudobkuLnr7sU9AjDRyw5iSh0lL3y50GzMNP_YP_n5ogOR9sOeHpAVRL4hDLls=w1366-h647';
                     if(nombre == '' || descripcion == '' || precio == ''){
                       showCustomErrorDialog(context, '¡Llene toda la información del platillo!');
                       return;
@@ -483,17 +543,29 @@ class _GestionMenuState extends State<GestionMenu>{
                     }
 
                     try {
-                      await supabase.from('Platillo').insert({
+                      final List<Map<String, dynamic>> nuevoPlatillo = await supabase.from('Platillo').insert({
                         'nombre': nombre,
                         'descripcion': descripcion,
                         'precio_unitario':
                             int.parse(precio), // Convertir a entero
                         'categoria_alimenticia': categoria,
-                      });
+                      }).select();
+
+                      if(image != null){
+                        final idNuevoPlatillo = nuevoPlatillo[0]['id'];
+                        final imageExtension = image!.path.split('.').last.toLowerCase();
+                        final imageBytes = await image!.readAsBytes();
+                        final imagePath = '/IDPlatillo/$idNuevoPlatillo/imagenPlatillo';
+                        await supabase.storage.from('platillos').uploadBinary(
+                          imagePath, imageBytes, fileOptions:  FileOptions(upsert:true, contentType: 'image/$imageExtension'),
+                        );
+                      }
+
                       Navigator.of(context).pop();
                       cargarPlatillos();
                     } catch (e) {
                       showCustomErrorDialog(context, e.toString());
+                      return;
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -553,17 +625,28 @@ class _GestionMenuState extends State<GestionMenu>{
             const SizedBox(height: 10), 
             ElevatedButton(
               onPressed: () async {
+                final idPlatillo = platillo['id'];
+                //Eliminamos el platillo
                 try {
                   await supabase
                     .from('Platillo')
                     .delete()
                     .match({ 'id': platillo['id'] });
+                } catch (e) {
+                  showCustomErrorDialog(context, e.toString());
+                  return;
+                }
+                
+                //Eliminamos su correspondiente imagen
+                try {
+                  await supabase.storage.from('platillos').remove(['IDPlatillo/$idPlatillo/imagenPlatillo']);
                   Navigator.of(context).pop();
                   setState(() {
                     cargarPlatillos();
                   });
                 } catch (e) {
                   showCustomErrorDialog(context, e.toString());
+                  return;
                 }
               },
               style: ElevatedButton.styleFrom(
