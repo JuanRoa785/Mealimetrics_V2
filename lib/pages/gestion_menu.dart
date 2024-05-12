@@ -471,11 +471,11 @@ class _GestionMenuState extends State<GestionMenu>{
                             color: EsquemaDeColores.primary,
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 5),
                         DropdownButton<String>(
                           value: categoria,
                           icon: const Icon(Icons.arrow_downward),
-                          iconSize: 24,
+                          iconSize: 20,
                           elevation: 16,
                           style: const TextStyle(
                               color: Colors.deepPurple, fontSize: 18),
@@ -635,7 +635,7 @@ class _GestionMenuState extends State<GestionMenu>{
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Crear Platillo",
+          title: const Text("Actualizar Plato",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 28,
@@ -741,11 +741,11 @@ class _GestionMenuState extends State<GestionMenu>{
                             color: EsquemaDeColores.primary,
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 5),
                         DropdownButton<String>(
                           value: categoria,
                           icon: const Icon(Icons.arrow_downward),
-                          iconSize: 24,
+                          iconSize: 20,
                           elevation: 16,
                           style: const TextStyle(
                               color: Colors.deepPurple, fontSize: 18),
@@ -765,7 +765,7 @@ class _GestionMenuState extends State<GestionMenu>{
                               child: Text(
                                 value,
                                 style: const TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 17,
                                   color: EsquemaDeColores.primary,
                                 ),
                               ),
@@ -789,15 +789,15 @@ class _GestionMenuState extends State<GestionMenu>{
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Colors.red,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   child: const Text(
-                    'Cancelar',
+                    'cerrar',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -866,7 +866,7 @@ class _GestionMenuState extends State<GestionMenu>{
                   child: const Text(
                     'Actualizar',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),

@@ -231,7 +231,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                 text: 'Usuario: ',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 20,
+                  fontSize: 19,
                   color: EsquemaDeColores.onSecondary,
                 ),
                 children: <TextSpan>[
@@ -239,7 +239,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                     text: empleado['user_name'],
                     style: const TextStyle(
                       fontWeight: FontWeight.normal,
-                      fontSize: 19,
+                      fontSize: 18,
                       color: EsquemaDeColores
                           .onPrimary, // Puedes personalizar el estilo aquí
                     ),
@@ -279,7 +279,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                       'Estado:',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, 
-                          fontSize: 19),
+                          fontSize: 18),
                     ),
                     DropdownButton<String>(
                       value: empleado['estado_cuenta'],
@@ -296,7 +296,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                               style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.normal,
-                                  fontSize: 19)),
+                                  fontSize: 18)),
                         );
                       }).toList(),
                     ),
@@ -305,7 +305,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                       style:
                           TextStyle(
                             fontWeight: FontWeight.bold, 
-                            fontSize: 19
+                            fontSize: 18
                           ),
                     ),
                     DropdownButton<String>(
@@ -323,7 +323,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                               style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.normal,
-                                  fontSize: 19
+                                  fontSize: 18
                                   )
                                 ),
                         );
