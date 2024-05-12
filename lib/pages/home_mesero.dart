@@ -3,6 +3,7 @@ import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/home_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';
+import 'package:mealimetrics/Pedidos/pedidos_main.dart';
 
 class HomeMesero extends StatefulWidget {
   const HomeMesero({super.key});
@@ -19,7 +20,7 @@ class _HomeMeseroState extends State<HomeMesero> {
       appBar: AppBar(
         backgroundColor: EsquemaDeColores.backgroundSecondary,
         title: const Text(
-          'Home Mesero',
+          'Pedidos',
           style: TextStyle(fontSize: 25,
           fontWeight: FontWeight.bold
             )
@@ -46,15 +47,10 @@ class _HomeMeseroState extends State<HomeMesero> {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            
-          ],
+      body: const Center(
+        child: PedidosMain()
         ),
-      ),
-    );
+      );
   }
 
   Future<void> signOut() async {

@@ -46,7 +46,7 @@ class _HomeChefState extends State<HomeChef> {
           ),
         ],
       ),
-      body: Center(
+      body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

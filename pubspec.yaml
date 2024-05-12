@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  dropdown_button2: ^2.3.8
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -40,6 +40,9 @@ dependencies:
   http: ^0.13.0
   flutterflow_ui: ^0.2.0+1
   intl: ^0.18.1
+  flutter_riverpod: ^2.5.1
+
+  
 
 dev_dependencies:
   flutter_test:
