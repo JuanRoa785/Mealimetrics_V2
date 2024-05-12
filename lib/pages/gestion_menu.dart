@@ -6,6 +6,8 @@ import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class GestionMenu extends StatefulWidget {
   const GestionMenu({super.key});
@@ -235,7 +237,10 @@ class _GestionMenuState extends State<GestionMenu>{
   Card buildPlatilloCard(Map<String, dynamic> platillo) {
     final idPlatillo = platillo['id'];
     final path = 'IDPlatillo/$idPlatillo/imagenPlatillo';
-    final String imageRoute = supabase.storage.from('platillos').getPublicUrl(path); 
+    String imageRoute = supabase.storage.from('platillos').getPublicUrl(path); 
+    imageRoute = Uri.parse(imageRoute).replace(queryParameters: {
+      't': DateTime.now().millisecond.toString()
+      }).toString();
     //print(imageRoute);
     return Card(
       elevation: 5,
@@ -253,7 +258,6 @@ class _GestionMenuState extends State<GestionMenu>{
                 ),
               ),
             ),
-          
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 15.0, top: 10.0, bottom: 10.0),
@@ -263,12 +267,16 @@ class _GestionMenuState extends State<GestionMenu>{
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                        Text(
-                        platillo['nombre'],
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        Flexible( 
+                          child: Text(
+                            platillo['nombre'],
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                            softWrap: true, // Esto permite que el texto se envuelva
+                          ),
                       ),
                     ],
                   ),
@@ -305,7 +313,7 @@ class _GestionMenuState extends State<GestionMenu>{
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          // Lógica para ACTUALIZAR un platillo
+                          actualizarPlatillo(platillo);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: EsquemaDeColores.secondary,
@@ -342,7 +350,7 @@ class _GestionMenuState extends State<GestionMenu>{
     String precio = '';
     List<String> listaCategorias = ['Seco', 'Principio', 'Bebida', 'Sopa', 'Complemento'];
     String categoria = listaCategorias.first; // Categoría por defecto
-    XFile? image;
+    XFile? image ;
 
     await showDialog(
       context: context,
@@ -528,7 +536,6 @@ class _GestionMenuState extends State<GestionMenu>{
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    //const String defaultRoute = 'https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihaONdadrWYjY7viSH7kaIx2hRjz0TLGG5CepqudobkuLnr7sU9AjDRyw5iSh0lL3y50GzMNP_YP_n5ogOR9sOeHpAVRL4hDLls=w1366-h647';
                     if(nombre == '' || descripcion == '' || precio == ''){
                       showCustomErrorDialog(context, '¡Llene toda la información del platillo!');
                       return;
@@ -550,13 +557,22 @@ class _GestionMenuState extends State<GestionMenu>{
                         'categoria_alimenticia': categoria,
                       }).select();
 
+                      final idNuevoPlatillo = nuevoPlatillo[0]['id'];
+                      final imagePath = '/IDPlatillo/$idNuevoPlatillo/imagenPlatillo';
+
                       if(image != null){
-                        final idNuevoPlatillo = nuevoPlatillo[0]['id'];
                         final imageExtension = image!.path.split('.').last.toLowerCase();
                         final imageBytes = await image!.readAsBytes();
-                        final imagePath = '/IDPlatillo/$idNuevoPlatillo/imagenPlatillo';
                         await supabase.storage.from('platillos').uploadBinary(
                           imagePath, imageBytes, fileOptions:  FileOptions(upsert:true, contentType: 'image/$imageExtension'),
+                        );
+                      }
+                      else{
+                        const defaultRoute = 'https://lh3.googleusercontent.com/fife/ALs6j_EcQD7GAXpgxohKMGrzoFv0_hncOPsPHd4n_XbM6koMI3I5z6FoJB5pzwJu0maY9xNsb1EEX4XqRus9p_NYp9lUx84Gvyy7ZDsMOR7rmMRdMhg7__8N5JUowUGZJrYa1LDrnIlPnpSspKLFumJIw41iMOOoGKJbP5V2vFTu7TrwPhhG2s16jNPqkW-ujqGPq-9a8gf-VSqhKPcM8dyTz8lKKPQllLe3hQpkGUTPPiR_DtkRhm1Y6FhXFwENS3oICrDupZcecUarWv0QP-js5bR0aNQg-vnS2V6MeF5Wct7tKBAYGZEi4uv8l4Nb9-j7hu20avGpdAXE7ftGth-qLhE-XRebmBLpMJDkFdkeZ9f5YmFZarxSkLoRj4tTf65-HSp16yvLwy7ys4-e8hIKUpdwQd3pNMMzXvBVoWsftx9LUVvo9OCwNAOhWNlJ7fFZBASebCLWdR2oz0gZ3PmgEFUcFm_tX972SANN-RtHmgAjxuHj2cEWFvFiWXwl-rIUKlYsa-Zr96450ni5PIMscZaLBKHNVoz7aK0tvXhSR6tOyd7nTfFoucnRBaheSyAMoV9xS5tUx_1xHdeF6uBmpvmw8WXk1KR2YAA_7C0RxV_UrJJufWvURnpySDrCIOVcrnaX5scApS0XexhA_kzmU6J7Z7XbOC3HzrT8FrQ0yP1_PsHb9TlO2C06ql3rFJ5FtrSY4-O2yRTdiVTkkz6_9ze__tlDdAw-81JSvQcDujyWpsQbtOrEDiAaymJRicFM7Bjo0al-aUT5vUpubySmbzDRWEkQc5lSjk9XXF5V-c0qRGfCtUsUtcKybODHdIFu49O_V11tpanwq3GwQrJikcVlF_eb1zMIiPvXX5b-TYmys44nKaksnQyaFQWx7DPSnUdfgUuL0V5nhWF1Yjd71CqO648apfN8BtEMxlCG0l7iFpxmNA-Nu2VUvCsD11HH1l1nHK3A-PVSl1zhsj0s1TTFA11tpNeNYxAM1Rtdonbq3GFR6tu4TAMFDwbBM_rYfZWU4_VRo-noKXtdiyzPAnkw-EEtSEhHpJkwZLO4jriSrP0jDMW87a5XWwYfEQR_QQqkjjTjJhaLvZT9uIdUslMjpauUfosXkdQZZ0YyX27WFt6jIUR2ofFwLGz-MICiQfznw_Lne7yBZAk5cFzKruGOXtsfMYxr0iq_9lQxidNYAJJUTrzj6tey3U-pln4hfDZMwNsIstRJS1EB-fkoiy9KRycu8m9iFiz0G28pH-EomL8DtGeQ0mlOYluvhQ-dcjyj6EDgd_DHLSxf_P6LPZ0Cky0oZLrg859AUQc5zXYUvD30F3sxDTj_ZUiDxX1Wg4TBmbAhZERdNKywLTqxTLliXCviQ75QasU2h84c1oEKmbOn-ccPp4sJXqHHxSfLBQvxZ5dsCWC3wAP07LEnrH6Yd60S_u77hL4n_C4xmyaNmQ5Q32s1cC0sTYC2xyEV2WtzA6q7msrq6YJBC5O7eIGY4uRxSrAPggZETjxpH_wGtXuw_5pdx5iDvvkMhbnPWOIflb9PVdDyzcJGjcqt15dJ8UxSPZ8YhOFDNtQ8eNfR3kfaIw2ivzCdjylSnolZBugfVgb0sFZmtEblDh0bP8ACxoza8VJk38rZ_Sg1iaOKOGN8Lo_yZhbv3ORPCPfc5UYx555M1G4VX1yLYdaqsRYfBUMXlIIjA4KnDBvBW7QZVECdFeR1nQHRNJA=w1325-h619';
+                        final defaultImage = await http.get(Uri.parse(defaultRoute)); 
+                        final defaultImageBytes = defaultImage.bodyBytes;
+                        await supabase.storage.from('platillos').uploadBinary(
+                          imagePath, defaultImageBytes, fileOptions:  const FileOptions(upsert:true, contentType: 'image/.jpeg'),
                         );
                       }
 
@@ -575,6 +591,281 @@ class _GestionMenuState extends State<GestionMenu>{
                   ),
                   child: const Text(
                     'Crear',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> actualizarPlatillo(Map<String, dynamic> platillo) async {
+    //Controladores - Obtener la información del platillo
+    final nombreController = TextEditingController();
+    nombreController.text = platillo['nombre'];
+    final descripcionController = TextEditingController();
+    descripcionController.text = platillo['descripcion'];
+    final precioController = TextEditingController();
+    precioController.text = platillo['precio_unitario'].toString();
+    //Dropdownbutton - Iniciar en el correcto:
+    List<String> listaCategorias = ['Seco', 'Principio', 'Bebida', 'Sopa', 'Complemento'];
+    String categoria = listaCategorias.first;
+    for (var i = 0; i < listaCategorias.length; i++) {
+      if(listaCategorias[i]==platillo['categoria_alimenticia']){
+        categoria = listaCategorias[i];
+      }
+    }
+    //Cargar imagen por defecto
+    final idPlatillo = platillo['id'];
+    final path = 'IDPlatillo/$idPlatillo/imagenPlatillo';
+    String rutaImagen = supabase.storage.from('platillos').getPublicUrl(path);
+    rutaImagen = Uri.parse(rutaImagen).replace(queryParameters: {
+      't': DateTime.now().millisecond.toString()
+      }).toString();
+    //nueva imagen
+    XFile? newImage;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Crear Platillo",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 28,
+                color: Colors.green,
+              ),
+              textAlign: TextAlign.center
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return SingleChildScrollView(
+                child:  Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height:8),
+                    SizedBox(
+                      width:150,
+                      height:150,
+                      child: newImage!=null 
+                      ? Image.file(File(newImage!.path))
+                      :Image.network(
+                        rutaImagen,
+                        fit: BoxFit.cover,
+                      )
+                    ),
+                    const SizedBox(height: 10,),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final ImagePicker picker = ImagePicker();
+                        final XFile? pickedImage =
+                          await picker.pickImage(source: ImageSource.gallery);
+                        if(pickedImage != null){
+                          setState(() {
+                            newImage = pickedImage;
+                            }
+                          );
+                        }
+                        else{
+                          return;
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Cargar Imagen',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+
+                    TextField(
+                      controller: nombreController,
+                      decoration: const  InputDecoration(
+                        labelText: 'Nombre',
+                        labelStyle: TextStyle(
+                          color: EsquemaDeColores.primary,
+                          fontSize: 18,
+                        ),
+                      ),
+                      onChanged: (value) {},
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: descripcionController,
+                      maxLines: null, // Para permitir múltiples líneas
+                      decoration: const InputDecoration(
+                        labelText: 'Descripción',
+                        labelStyle: TextStyle(
+                          color: EsquemaDeColores.primary,
+                          fontSize: 18,
+                        ),
+                      ),
+                      onChanged: (value) {},
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: precioController,
+                      decoration: const InputDecoration(
+                        labelText: 'Precio',
+                        labelStyle: TextStyle(
+                          color: EsquemaDeColores.primary,
+                          fontSize: 18,
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {},
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        const Text(
+                          'Categoría:',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: EsquemaDeColores.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        DropdownButton<String>(
+                          value: categoria,
+                          icon: const Icon(Icons.arrow_downward),
+                          iconSize: 24,
+                          elevation: 16,
+                          style: const TextStyle(
+                              color: Colors.deepPurple, fontSize: 18),
+                          underline: Container(
+                            height: 2,
+                            color: Colors.deepPurpleAccent,
+                          ),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              categoria = newValue!;
+                            });
+                          },
+                          items: listaCategorias
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  color: EsquemaDeColores.primary,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              );
+            },
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                const SizedBox(height: 15),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Cancelar',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    if(nombreController.text.trim() == '' || descripcionController.text.trim() == '' || precioController.text.trim() == ''){
+                      showCustomErrorDialog(context, '¡Llene toda la información del platillo!');
+                      return;
+                    }
+
+                    try {
+                      int.parse(precioController.text.trim());
+                    } catch (e) {
+                      showCustomErrorDialog(context, '¡El precio del platillo debe ser un número entero!');
+                      return;
+                    }
+
+                    try {
+                      await supabase.from('Platillo').update({
+                        'nombre': nombreController.text.trim(),
+                        'descripcion': descripcionController.text.trim(),
+                        'precio_unitario':
+                            int.parse(precioController.text.trim()), // Convertir a entero
+                        'categoria_alimenticia': categoria,
+                      })
+                      .match({'id':'$idPlatillo'});
+                      
+                      //'Update' de la imagen del platillo
+                      if (newImage != null) {
+                        final imageExtension = newImage!.path.split('.').last.toLowerCase();
+                        final imageBytes = await newImage!.readAsBytes();
+                        //eliminamos la imagen anterior:
+                        try {
+                          await supabase.storage.from('platillos').remove(['IDPlatillo/$idPlatillo/imagenPlatillo']);
+                        } catch (e) {
+                          showCustomErrorDialog(context, e.toString());
+                          return;
+                        }
+                        //Subimos la nueva:
+                        await supabase.storage.from('platillos').uploadBinary(
+                          'IDPlatillo/$idPlatillo/imagenPlatillo', 
+                          imageBytes, 
+                          fileOptions:  FileOptions(
+                            upsert:true,
+                            contentType: 'image/$imageExtension'
+                          ),
+                        );
+                      }
+                      
+                      Navigator.of(context).pop();
+                      cargarPlatillos();
+                    } catch (e) {
+                      showCustomErrorDialog(context, e.toString());
+                      return;
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Actualizar',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
