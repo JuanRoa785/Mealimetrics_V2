@@ -69,8 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                         "Digite sus credenciales:",
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 18,
-                          
+                          fontSize: 18,       
                         ),
                       ),
                     ),
