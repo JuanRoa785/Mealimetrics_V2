@@ -257,6 +257,9 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
     return Scaffold(
 
       appBar: AppBar(
+        iconTheme: const IconThemeData(
+          color: EsquemaDeColores.onPrimary
+        ),
         centerTitle: true,
         title: const Text(
             'Seleccionar Platillo',

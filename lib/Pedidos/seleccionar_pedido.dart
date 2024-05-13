@@ -12,6 +12,10 @@ class SeleccionarPedido extends StatelessWidget {
         
         centerTitle: true,
 
+        iconTheme: const IconThemeData(
+          color: EsquemaDeColores.onPrimary
+        ),
+
         title: const Text(
           'Tomar Pedido',
           style: TextStyle( color: EsquemaDeColores.onPrimary),
