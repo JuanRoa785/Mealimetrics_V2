@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 import 'pedidos_list_view.dart';
 
 class PedidosMain extends ConsumerWidget {
@@ -31,7 +32,7 @@ class PedidosMain extends ConsumerWidget {
             Navigator.pushNamed(context, '/SeleccionarPedido');
           },
           
-          backgroundColor: Colors.red, // Color de fondo del botón flotante
+          backgroundColor: EsquemaDeColores.primary, // Color de fondo del botón flotante
           child: const Icon(Icons.add), // Icono de la cruz
         ),
 
