@@ -12,8 +12,7 @@ class PedidosMain extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref ) {
     return Scaffold(
-      appBar: AppBar(
-      ),
+
       body: const Center(
         child: PedidosListView(),
       ),

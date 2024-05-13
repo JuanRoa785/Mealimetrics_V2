@@ -276,7 +276,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   ;
 
 
-                  relacionarPedidoPlatillo( dataPedidoId[0]['id']  , ref.watch(riverpodPlatillosHashSet) );
+                  relacionarPedidoPlatillo( dataPedidoId[0]['id'] , ref.watch(riverpodPlatillosHashSet),  );
 
                   //const meter a gregar a diccionario;
                   ref.read(riverpodListaPedidos).addDictionary( diccionarioPedido );
@@ -391,6 +391,7 @@ Future<void> relacionarPedidoPlatillo( int idPedido, HashSet<Map<String, dynamic
         .insert({
           'id_pedido': idPedido,
           'id_platillo': element['id'],
+          'cantidad': element['cantidad']
         })
       ;
     }
