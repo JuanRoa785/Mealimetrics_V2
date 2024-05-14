@@ -269,6 +269,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                       'paraLlevar': diccionarioPedido['paraLlevar'],
                       'identificador_manual': manualId,
                       'precioTotal': diccionarioPedido['precioTotal'],
+                      'id_mesero': supabase.auth.currentUser!.id,
                   });
 
 
