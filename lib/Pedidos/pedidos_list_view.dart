@@ -67,6 +67,12 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
                 color: EsquemaDeColores.onPrimary,
               ),
             ),
+            Text(
+              'Precio Total: ${pedido['precioTotal']}',
+              style: const TextStyle(
+                color: EsquemaDeColores.onPrimary,
+              ),
+            ),
           ],
         ),
       ),
