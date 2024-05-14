@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'estados\\modelo_lista_pedidos.dart';
 import '..\\Styles\\color_scheme.dart';
 
@@ -14,12 +15,15 @@ class PedidosListView extends ConsumerStatefulWidget{
 
 class _PedidosListView extends ConsumerState<PedidosListView>{
 
+  String _idMesero = '';
 
   @override
   void initState(){
     super.initState();
 
-    test();
+    obtenerIdMesero();
+
+    obtenerPedidosIniciales();
   }
 
   @override
@@ -120,12 +124,42 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
     );
   }
 
-  void test(){
+  Future<void> obtenerPedidosIniciales() async{
 
-    print("se entró a la función");
+    print("\n\n\n\nse entró a la función\n\n\n\n");
 
-    setState(() {});
+    final supabase = Supabase.instance.client;
+
+    final listaDePedidosDeActualMesero = await supabase
+      .from('Pedido')
+      .select()
+      .eq('id_mesero', _idMesero);
+
+    setState(() {
+
+      ref.read(riverpodListaPedidos).set( listaDePedidosDeActualMesero );
+
+    });
+    
+    print("\n\n\n\n\n Se hizo el retrieve de datos \n\n\n\n\n");
+
   }
+
+
+
+  Future<void> obtenerIdMesero() async {
+
+    final supabase = Supabase.instance.client;
+
+    final User user = supabase.auth.currentUser!;
+
+    setState(() {
+      _idMesero = user.id;
+    });
+
+  }
+
+
 
 }
 
