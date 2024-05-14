@@ -252,11 +252,10 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   'mesa': _mesa,
                   'paraLlevar': _paraLlevar,
                   'platillosListaString': toStringPlatillos(ref.watch(riverpodPlatillosHashSet)),
+                  'precioTotal' : calcularPrecioTotalPedido( ref.watch(riverpodPlatillosHashSet) ),
                   };
 
                   final manualId = createRandomString(20);
-
-                  int hola = calcularPrecioTotalPedido( ref.watch(riverpodPlatillosHashSet) );
 
                   await supabase
                     .from('Pedido')
@@ -268,6 +267,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                       'id_mesa': diccionarioPedido['mesa'],
                       'paraLlevar': diccionarioPedido['paraLlevar'],
                       'identificador_manual': manualId,
+                      'precioTotal': diccionarioPedido['precioTotal'],
                   });
 
 
@@ -278,13 +278,14 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   ;
 
 
-                  relacionarPedidoPlatillo( dataPedidoId[0]['id'] , ref.watch(riverpodPlatillosHashSet),  );
+                  relacionarPedidoPlatillo( dataPedidoId[0]['id'] , ref.watch(riverpodPlatillosHashSet)  );
 
                   //const meter a gregar a diccionario;
                   ref.read(riverpodListaPedidos).addDictionary( diccionarioPedido );
 
 
                   ref.read(riverpodPlatillosHashSet.notifier).state = HashSet();
+                  
                   Navigator.pop(context);
                 },
                 
