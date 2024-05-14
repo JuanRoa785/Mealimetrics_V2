@@ -86,7 +86,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
               height: 5.0,
             ),
             Text(
-              'Mesa: ${pedido["mesa"]}',
+              'Mesa: ${pedido["id_mesa"]}',
               style: const TextStyle(
                 color: EsquemaDeColores.onPrimary,
               ),
@@ -126,7 +126,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
 
   Future<void> obtenerPedidosIniciales() async{
 
-    print("\n\n\n\nse entró a la función\n\n\n\n");
+    String aux = '';
 
     final supabase = Supabase.instance.client;
 
@@ -135,14 +135,50 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
       .select()
       .eq('id_mesero', _idMesero);
 
+
+    for( var i = 0; i < listaDePedidosDeActualMesero.length; i++ ) {
+
+      aux = '';
+
+      print("\n\n++++++++++++++++++++++++++++ listaDePedidosActualMesero en indice $i tiene un id igual a: ${listaDePedidosDeActualMesero[i]['id']}  ++++++++++++++++++++++++++++\n\n");
+
+      final platillosDeCadaPedido = await supabase
+        .from('Relacion_Pedido_Platillo')
+        .select('''
+        id_platillo,
+        cantidad
+        ''')
+        .eq('id_pedido', listaDePedidosDeActualMesero[i]['id']);
+
+
+        print("\t\n\n------------------- Platillos para este pedido: $platillosDeCadaPedido ------------------- \n\n");
+
+        for( var j = 0; j < platillosDeCadaPedido.length; j++ ){
+
+          final nombreDeCadaPlatillo = await supabase
+            .from('Platillo')
+            .select('nombre')
+            .eq('id', platillosDeCadaPedido[j]['id_platillo']);
+
+
+          aux = '$aux${nombreDeCadaPlatillo[0]['nombre']} (X${platillosDeCadaPedido[j]['cantidad']}), ';
+
+          print("\n~~~~~~~~~~ Nombre #${j}: ${nombreDeCadaPlatillo[0]['nombre']} con cantidad ${platillosDeCadaPedido[j]['cantidad']} ~~~~~~~~~~\n");
+
+        }
+
+        listaDePedidosDeActualMesero[i]['platillosListaString'] = aux;
+        print('\n\Final text for pedido: $aux\n');
+
+    }
+
+
     setState(() {
 
       ref.read(riverpodListaPedidos).set( listaDePedidosDeActualMesero );
 
     });
-    
-    print("\n\n\n\n\n Se hizo el retrieve de datos \n\n\n\n\n");
-
+   
   }
 
 
