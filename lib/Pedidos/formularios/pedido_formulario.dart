@@ -27,12 +27,11 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
   @override
   void initState(){
-    
-    super.initState();
-
     initialiceTableDropDownItems();
 
     obtenerNombreMesero();
+
+    super.initState();
   }
 
 
@@ -103,12 +102,13 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
               TextField(
                 enableInteractiveSelection: false,
+                enabled: false,
                 textCapitalization: TextCapitalization.sentences,
                 autofocus: true,
                                 
                 decoration: InputDecoration(
                   hintText: 'Mesero',
-                  labelText: 'Nombre del Mesero',
+                  labelText: _mesero,
                   suffixIcon: const Icon( 
                     Icons.person,
                     color: EsquemaDeColores.secondary,
@@ -118,10 +118,6 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   ),
                 ),
 
-                onChanged: (mesero){
-                  _mesero = mesero;
-                  print("El nombre del mesero es: $_mesero");
-                },
               ),
 
               
