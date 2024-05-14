@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'estados\\modelo_lista_pedidos.dart';
 import '..\\Styles\\color_scheme.dart';
 
@@ -68,7 +69,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
               ),
             ),
             Text(
-              'Precio Total: ${pedido['precioTotal']}',
+              'Precio Total: \$${NumberFormat.decimalPattern("es_CO").format( pedido['precioTotal'] )} COP ',
               style: const TextStyle(
                 color: EsquemaDeColores.onPrimary,
               ),
