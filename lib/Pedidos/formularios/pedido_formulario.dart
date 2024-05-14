@@ -256,6 +256,8 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
                   final manualId = createRandomString(20);
 
+                  int hola = calcularPrecioTotalPedido( ref.watch(riverpodPlatillosHashSet) );
+
                   await supabase
                     .from('Pedido')
                     .insert({
@@ -368,11 +370,29 @@ String toStringPlatillos(HashSet<Map<String,dynamic>> hashSetDePlatillos ){
   String aux = '';
 
   
-    for (var element in hashSetDePlatillos) {
-        aux = aux + '${element['nombre']} (X${element['cantidad']}), '.toString();
-       }
+  for (var element in hashSetDePlatillos) {
+    aux = aux + '${element['nombre']} (X${element['cantidad']}), '.toString();
+    
+  }
+
 
     return aux;
+}
+
+int calcularPrecioTotalPedido(HashSet<Map<String,dynamic>> hashSetDePlatillos ){
+  
+  int precioTotal = 0;
+
+  for( var element in hashSetDePlatillos ){
+
+    precioTotal = precioTotal + toInt(  element['precio_unitario'] * element['cantidad'] )!;
+
+  }
+
+  print("\n\n===============================El precio total de los platillos es: ${precioTotal}===============================\n\n");
+
+  return precioTotal;
+
 }
 
 String createRandomString(int length) {
