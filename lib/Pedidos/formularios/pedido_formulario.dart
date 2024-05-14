@@ -261,17 +261,16 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   await supabase
                     .from('Pedido')
                     .insert({
-                      'cliente': diccionarioPedido['cliente'],
+                      'cliente': _cliente,
                       'fecha_pagado':  ( DateTime.timestamp().toIso8601String() ),
                       'tiempoPreparacion': '15 min',
-                      'mesero': diccionarioPedido['mesero'],
-                      'id_mesa': diccionarioPedido['mesa'],
-                      'paraLlevar': diccionarioPedido['paraLlevar'],
+                      'mesero': _mesero,
+                      'id_mesa': _mesa,
+                      'paraLlevar': _paraLlevar,
                       'identificador_manual': manualId,
-                      'precioTotal': diccionarioPedido['precioTotal'],
+                      'precioTotal': calcularPrecioTotalPedido( ref.watch(riverpodPlatillosHashSet) ),
                       'id_mesero': supabase.auth.currentUser!.id,
                   });
-
 
                   final dataPedidoId = await supabase
                     .from('Pedido')

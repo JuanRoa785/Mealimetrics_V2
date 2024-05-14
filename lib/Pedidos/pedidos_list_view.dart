@@ -15,18 +15,51 @@ class PedidosListView extends ConsumerStatefulWidget{
 class _PedidosListView extends ConsumerState<PedidosListView>{
 
 
+  @override
+  void initState(){
+    super.initState();
+
+    test();
+  }
+
+  @override
+  Widget build( BuildContext context ){
+    return Scaffold(
+      body: ListView(
+
+        padding: const EdgeInsets.symmetric(
+          horizontal: 15.0,
+          vertical: 23.0,
+        ),
+
+        children: ref.watch(riverpodListaPedidos).listaPedidos.map( (pedido) => pedidoCard(pedido)).toList(),
+
+                 
+      ),
+    );
+  }
+
+
+
   //método para crear las card
   Widget pedidoCard( Map<String, dynamic> pedido ){
     return Card(
+
       elevation: 20,
       margin: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
       color: EsquemaDeColores.secondary,
+
       shape: OutlineInputBorder(
         borderRadius:  BorderRadius.circular(13.0),
         borderSide: BorderSide.none,
       ),
+
+
       child:Padding(
+        
         padding: const EdgeInsets.all(12.0),
+
+
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -87,23 +120,14 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
     );
   }
 
+  void test(){
 
+    print("se entró a la función");
 
-  @override
-  Widget build( BuildContext context ){
-    return Scaffold(
-      body: ListView(
-
-        padding: const EdgeInsets.symmetric(
-          horizontal: 15.0,
-          vertical: 23.0,
-        ),
-
-        children: ref.watch(riverpodListaPedidos).listaPedidos.map( (pedido) => pedidoCard(pedido)).toList(),
-
-                 
-      ),
-    );
+    setState(() {});
   }
+
 }
+
+
 
