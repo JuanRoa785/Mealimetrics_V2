@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'estados\\modelo_lista_pedidos.dart';
 import '..\\Styles\\color_scheme.dart';
 

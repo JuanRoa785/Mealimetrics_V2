@@ -19,7 +19,7 @@ class PedidoFormulario extends ConsumerStatefulWidget {
 class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
   String _cliente = '';
-  String _mesero = '';
+  String? _mesero;
   int? _mesa;
   List<DropdownMenuItem<int>> _tableDropDownMenuItems = [];
   bool? _paraLlevar;
@@ -101,16 +101,17 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
               ),
 
               TextField(
-                enableInteractiveSelection: false,
                 enabled: false,
+                readOnly: true,
                 textCapitalization: TextCapitalization.sentences,
                 autofocus: true,
                                 
                 decoration: InputDecoration(
-                  hintText: 'Mesero',
+                  hintText: _mesero,
                   labelText: _mesero,
                   suffixIcon: const Icon( 
                     Icons.person,
+
                     color: EsquemaDeColores.secondary,
                     ),
                   border: OutlineInputBorder(
@@ -390,16 +391,18 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
       .select('nombre_completo')
       .eq('id', idPersonaDeEmpleado[0]['id_persona']);
 
-    /// Ahora, este nombre es asignado a la variable
-    /// "nombreMesero" que le pertenece a este script.
-    /// De esta forma se obtiene el nombre que este tiene
-    /// en todo momento
-    _mesero = nombreEmpleado[0]['nombre_completo'];
 
 
+    setState(() {
+      /// Ahora, este nombre es asignado a la variable
+      /// "nombreMesero" que le pertenece a este script.
+      /// De esta forma se obtiene el nombre que este tiene
+      /// en todo momento
+      _mesero = nombreEmpleado[0]['nombre_completo'];
+    });
     /// Finalmente, lo muestro con un print...
     /// porque sí. es facil de debugear
-    print("\n\n======================= El usuario es: ${_mesero} =======================\n\n");
+    print("\n\n======================= El mesero es: ${_mesero} =======================\n\n");
 
     
 
