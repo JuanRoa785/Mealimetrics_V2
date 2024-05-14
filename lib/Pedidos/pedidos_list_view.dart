@@ -63,11 +63,17 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
                 color: EsquemaDeColores.onPrimary,
               ),
             ),
+            const SizedBox(
+              height: 5.0,
+            ),
             Text(
               'Platillos: ${pedido['platillosListaString']}',
               style: const TextStyle(
                 color: EsquemaDeColores.onPrimary,
               ),
+            ),
+            const SizedBox(
+              height: 5.0,
             ),
             Text(
               'Precio Total: \$${NumberFormat.decimalPattern("es_CO").format( pedido['precioTotal'] )} COP ',
