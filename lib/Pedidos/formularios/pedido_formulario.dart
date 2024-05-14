@@ -245,48 +245,95 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                 
                 onPressed: () async {
                   
+                  /// Primero, establecemos la conexión con
+                  /// la base de datos
                   final supabase = Supabase.instance.client;
 
-                  Map<String, dynamic> diccionarioPedido = {
-                  'cliente': _cliente,
-                  'mesero': _mesero,
-                  'mesa': _mesa,
-                  'paraLlevar': _paraLlevar,
-                  'platillosListaString': toStringPlatillos(ref.watch(riverpodPlatillosHashSet)),
-                  'precioTotal' : calcularPrecioTotalPedido( ref.watch(riverpodPlatillosHashSet) ),
-                  };
-
+                  /// Luego, se crea el id manual para poder
+                  /// obtener los datos que se subieron
+                  /// a la base de datos, después de haberlos 
+                  /// subidos. Esto es así porque necesito que 
+                  /// la base de datos le asigne automaticamente
+                  /// el id y, luego, con este yo puedo crear
+                  /// la relacion entre tabla pedido y platillos
                   final manualId = createRandomString(20);
 
+                  
+                  /// Creo el diccionario que va a servir
+                  /// para subir los datos a la base de datos
+                  /// y, tambien, para añadirlo al riverpodListaPedidos
+                  Map<String, dynamic> diccionarioPedido = {
+                    'cliente': _cliente,
+                    'fecha_pagado':  ( DateTime.timestamp().toIso8601String() ),
+                    'tiempoPreparacion': '15 min',
+                    'mesero': _mesero,
+                    'id_mesa': _mesa,
+                    'paraLlevar': _paraLlevar,
+                    'identificador_manual': manualId,
+                    'precioTotal': calcularPrecioTotalPedido( ref.watch(riverpodPlatillosHashSet) ),
+                    'id_mesero': supabase.auth.currentUser!.id,
+                  };
+
+
+
+
+                  /// Subo el diccionario anteriormente creado
+                  /// a la base de datos
                   await supabase
                     .from('Pedido')
-                    .insert({
-                      'cliente': _cliente,
-                      'fecha_pagado':  ( DateTime.timestamp().toIso8601String() ),
-                      'tiempoPreparacion': '15 min',
-                      'mesero': _mesero,
-                      'id_mesa': _mesa,
-                      'paraLlevar': _paraLlevar,
-                      'identificador_manual': manualId,
-                      'precioTotal': calcularPrecioTotalPedido( ref.watch(riverpodPlatillosHashSet) ),
-                      'id_mesero': supabase.auth.currentUser!.id,
-                  });
+                    .insert( diccionarioPedido );
 
-                  final dataPedidoId = await supabase
+                  
+
+
+                  /// Consigo el todas las columnas del pedido
+                  /// recientemente subido a la base de datos
+                  final dataPedido = await supabase
                     .from('Pedido')
-                    .select('id')
+                    .select()
                     .eq('identificador_manual', manualId)
                   ;
 
+                  /// Relaciono el pedido con los platillos que 
+                  /// se hayan ordenado, usando el id del pedido
+                  relacionarPedidoPlatillo( dataPedido[0]['id'] , ref.watch(riverpodPlatillosHashSet)  );
 
-                  relacionarPedidoPlatillo( dataPedidoId[0]['id'] , ref.watch(riverpodPlatillosHashSet)  );
 
-                  //const meter a gregar a diccionario;
+
+                  /// Ahora, ese diccionario que creamos hace un
+                  /// momento, se va a reemplazar por lo que sea
+                  /// que hayamos guardado en la base de datos. Esto
+                  /// porque hay variables que nos faltan y que
+                  /// asigna la base de datos automaticamente
+                  diccionarioPedido = dataPedido[0];
+
+                
+                  /// Ahora, ese diccionario que creamos hace un 
+                  /// instante, lo vamos a meter en el riverpodListPedidos
+                  /// PERO, antes se debe añadir una cosita que nos permite
+                  /// mostrar en forma de string los platillos que se 
+                  /// pidieron en este pedido. Este string se guardará en
+                  /// la key 
+                  diccionarioPedido['platillosListaString'] = toStringPlatillos( ref.watch(riverpodPlatillosHashSet) );
+
+
+
+                  /// Ahora, sí vamos a insertar ese diccionario
+                  /// dentro del riverpod
                   ref.read(riverpodListaPedidos).addDictionary( diccionarioPedido );
+
+
+
+                  /// Imprimimos la variable para ver si todo bien
+                 for( var i = 0; i < ref.watch(riverpodListaPedidos).listaPedidos.length; i++ )
+                  {
+                    print("\n\n================= riverpodListPedidos en indice $i es: ${ref.watch(riverpodListaPedidos).listaPedidos[i]} ================= \n\n");
+                  }
 
 
                   ref.read(riverpodPlatillosHashSet.notifier).state = HashSet();
                   
+                 
                   Navigator.pop(context);
                 },
                 
@@ -425,7 +472,7 @@ String toStringPlatillos(HashSet<Map<String,dynamic>> hashSetDePlatillos ){
   String aux = '';
 
   
-  for (var element in hashSetDePlatillos) {
+  for(var element in hashSetDePlatillos) {
     aux = aux + '${element['nombre']} (X${element['cantidad']}), '.toString();
     
   }
