@@ -25,11 +25,14 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    //deleteme?
+    
+    /// con esta funcion vamos a la base de datos y 
+    /// hacemos "fetch" a la informacion sobre todos
+    /// los platillos que el negocio tenga a la venta
     readPlatillosData();
   }
 
-  // deleteMe?
+  
   // Para hacer read de los platillos en la bd
     Future<void> readPlatillosData() async {
        WidgetsFlutterBinding.ensureInitialized();
