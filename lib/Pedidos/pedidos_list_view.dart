@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'estados\\modelo_lista_pedidos.dart';
 import '..\\Styles\\color_scheme.dart';
 
@@ -13,18 +15,55 @@ class PedidosListView extends ConsumerStatefulWidget{
 
 class _PedidosListView extends ConsumerState<PedidosListView>{
 
+  String _idMesero = '';
+
+  @override
+  void initState(){
+    super.initState();
+
+    obtenerIdMesero();
+
+    obtenerPedidosIniciales();
+  }
+
+  @override
+  Widget build( BuildContext context ){
+    return Scaffold(
+      body: ListView(
+
+        padding: const EdgeInsets.symmetric(
+          horizontal: 15.0,
+          vertical: 23.0,
+        ),
+
+        children: ref.watch(riverpodListaPedidos).listaPedidos.map( (pedido) => pedidoCard(pedido)).toList(),
+
+                 
+      ),
+    );
+  }
+
+
+
   //método para crear las card
   Widget pedidoCard( Map<String, dynamic> pedido ){
     return Card(
+
       elevation: 20,
       margin: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
       color: EsquemaDeColores.secondary,
+
       shape: OutlineInputBorder(
         borderRadius:  BorderRadius.circular(13.0),
         borderSide: BorderSide.none,
       ),
+
+
       child:Padding(
+        
         padding: const EdgeInsets.all(12.0),
+
+
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -47,7 +86,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
               height: 5.0,
             ),
             Text(
-              'Mesa: ${pedido["mesa"]}',
+              'Mesa: ${pedido["id_mesa"]}',
               style: const TextStyle(
                 color: EsquemaDeColores.onPrimary,
               ),
@@ -61,8 +100,20 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
                 color: EsquemaDeColores.onPrimary,
               ),
             ),
+            const SizedBox(
+              height: 5.0,
+            ),
             Text(
               'Platillos: ${pedido['platillosListaString']}',
+              style: const TextStyle(
+                color: EsquemaDeColores.onPrimary,
+              ),
+            ),
+            const SizedBox(
+              height: 5.0,
+            ),
+            Text(
+              'Precio Total: \$${NumberFormat.decimalPattern("es_CO").format( pedido['precioTotal'] )} COP ',
               style: const TextStyle(
                 color: EsquemaDeColores.onPrimary,
               ),
@@ -73,20 +124,121 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
     );
   }
 
-   @override
-  Widget build( BuildContext context ){
-    return Scaffold(
-      body: ListView(
+  Future<void> obtenerPedidosIniciales() async{
 
-        padding: const EdgeInsets.symmetric(
-          horizontal: 15.0,
-          vertical: 23.0,
-        ),
+    ///En esta variable se va a almacenar el string
+    ///final que se va a poner en las cards de la aplicación.
+    String aux = '';
 
-        children: ref.watch(riverpodListaPedidos).listaPedidos.map( (pedido) => pedidoCard(pedido)).toList(),
-         
-      ),
-    );
+    /// Primero, nos conectamos a la base de datos
+    final supabase = Supabase.instance.client;
+
+    /// Luego, se obtienen todas las columnas de la 
+    /// tabla "Pedido" que le pertenezcan al mesero
+    /// cuya sesión actual esté iniciada y conectada
+    /// en el celular. Esto se encuentra a través del
+    /// id del mesero
+    final listaDePedidosDeActualMesero = await supabase
+      .from('Pedido')
+      .select()
+      .eq('id_mesero', _idMesero);
+
+
+    /// Ahora, vamos a recorrer todos estos pedidos 
+    /// para sacar información de ellos
+    for( var i = 0; i < listaDePedidosDeActualMesero.length; i++ ) {
+
+      /// Se vacía el string para que se pueda reutilizar
+      /// para el siguiente pedido
+      aux = '';
+
+      print("\n\n++++++++++++++++++++++++++++ listaDePedidosActualMesero en indice $i tiene un id igual a: ${listaDePedidosDeActualMesero[i]['id']}  ++++++++++++++++++++++++++++\n\n");
+
+      /// Para cada pedido, encontramos los platillos
+      /// que se pidieron para ese pedido. Para esto
+      /// para cada uno de los pedidos, lo buscamos
+      /// en la tabla relacional que relaciona los
+      /// pedidos con los platillos que se pidieron
+      /// y se saca su id (para averiguar el nombre)
+      /// y su cantidad.
+      /// 
+      /// EJEMPLO: Si en un pedido se pidieron una
+      /// hamburguesa y un jugo, se consigue el id
+      /// del pedido y, usando este, se buscan
+      /// los platillos en la talba "Relacion_Pedido_Platillo"
+      /// Pedido: ID = 1    ------> Platillos: id_1 =2 y id_2 = 3
+      /// Pedido: ID = 1   -------> Cantidades:  id_1: cantidad = 1 id_2: cantidad= 2
+      /// 
+      final platillosDeCadaPedido = await supabase
+        .from('Relacion_Pedido_Platillo')
+        .select('''
+        id_platillo,
+        cantidad
+        ''')
+        .eq('id_pedido', listaDePedidosDeActualMesero[i]['id']);
+
+
+        print("\t\n\n------------------- Platillos para este pedido: $platillosDeCadaPedido ------------------- \n\n");
+
+
+        /// Para cada uno de esos platillos se encuentra el nombre
+        /// Esto se hace con una consulta a la tabla "Platillo" usando
+        /// el id de cada platillo que compone el pedido
+        for( var j = 0; j < platillosDeCadaPedido.length; j++ ){
+
+          /// Se hace la consulta
+          final nombreDeCadaPlatillo = await supabase
+            .from('Platillo')
+            .select('nombre')
+            .eq('id', platillosDeCadaPedido[j]['id_platillo']);
+
+          /// Se compone el string del nombre del platillo
+          /// y la cantidad de este platillo, para cada uno
+          /// de los platillos que componen el pedido:
+          /// Ejemplo: HamburguesaClasica (X3), Jugo de Mora (X8),
+          aux = '$aux${nombreDeCadaPlatillo[0]['nombre']} (X${platillosDeCadaPedido[j]['cantidad']}), ';
+
+          print("\n~~~~~~~~~~ Nombre #${j}: ${nombreDeCadaPlatillo[0]['nombre']} con cantidad ${platillosDeCadaPedido[j]['cantidad']} ~~~~~~~~~~\n");
+
+        }
+
+        /// Se hace la asignación a una clave en la lista 
+        /// de pedidos (estos pedidos son diccionarios).
+        listaDePedidosDeActualMesero[i]['platillosListaString'] = aux;
+
+        print('\n\Final text for pedido: $aux\n');
+
+    }
+
+
+    setState(() {
+
+      /// Finalmente, con la clave "platillosListaString"
+      /// ya asignada al diccionario que contiene la información
+      /// sobre cada pedido, se hace la asignación al riverpodListaPedidos
+      ref.read(riverpodListaPedidos).set( listaDePedidosDeActualMesero );
+
+    });
+   
   }
+
+
+
+  Future<void> obtenerIdMesero() async {
+
+    final supabase = Supabase.instance.client;
+
+    final User user = supabase.auth.currentUser!;
+
+    setState(() {
+      _idMesero = user.id;
+    });
+
+  }
+
+
+
 }
+
+
 

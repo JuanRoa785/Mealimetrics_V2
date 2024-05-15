@@ -19,7 +19,7 @@ class PedidoFormulario extends ConsumerStatefulWidget {
 class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
   String _cliente = '';
-  String _mesero = '';
+  String? _mesero;
   int? _mesa;
   List<DropdownMenuItem<int>> _tableDropDownMenuItems = [];
   bool? _paraLlevar;
@@ -28,6 +28,9 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
   @override
   void initState(){
     initialiceTableDropDownItems();
+
+    obtenerNombreMesero();
+
     super.initState();
   }
 
@@ -98,15 +101,17 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
               ),
 
               TextField(
-                enableInteractiveSelection: false,
+                enabled: false,
+                readOnly: true,
                 textCapitalization: TextCapitalization.sentences,
                 autofocus: true,
                                 
                 decoration: InputDecoration(
-                  hintText: 'Mesero',
-                  labelText: 'Nombre del Mesero',
+                  hintText: _mesero,
+                  labelText: _mesero,
                   suffixIcon: const Icon( 
                     Icons.person,
+
                     color: EsquemaDeColores.secondary,
                     ),
                   border: OutlineInputBorder(
@@ -114,10 +119,6 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   ),
                 ),
 
-                onChanged: (mesero){
-                  _mesero = mesero;
-                  print("El nombre del mesero es: $_mesero");
-                },
               ),
 
               
@@ -244,45 +245,95 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                 
                 onPressed: () async {
                   
+                  /// Primero, establecemos la conexión con
+                  /// la base de datos
                   final supabase = Supabase.instance.client;
 
-                  Map<String, dynamic> diccionarioPedido = {
-                  'cliente': _cliente,
-                  'mesero': _mesero,
-                  'mesa': _mesa,
-                  'paraLlevar': _paraLlevar,
-                  'platillosListaString': toStringPlatillos(ref.watch(riverpodPlatillosHashSet)),
-                  };
-
+                  /// Luego, se crea el id manual para poder
+                  /// obtener los datos que se subieron
+                  /// a la base de datos, después de haberlos 
+                  /// subidos. Esto es así porque necesito que 
+                  /// la base de datos le asigne automaticamente
+                  /// el id y, luego, con este yo puedo crear
+                  /// la relacion entre tabla pedido y platillos
                   final manualId = createRandomString(20);
 
+                  
+                  /// Creo el diccionario que va a servir
+                  /// para subir los datos a la base de datos
+                  /// y, tambien, para añadirlo al riverpodListaPedidos
+                  Map<String, dynamic> diccionarioPedido = {
+                    'cliente': _cliente,
+                    'fecha_pagado':  ( DateTime.timestamp().toIso8601String() ),
+                    'tiempoPreparacion': '15 min',
+                    'mesero': _mesero,
+                    'id_mesa': _mesa,
+                    'paraLlevar': _paraLlevar,
+                    'identificador_manual': manualId,
+                    'precioTotal': calcularPrecioTotalPedido( ref.watch(riverpodPlatillosHashSet) ),
+                    'id_mesero': supabase.auth.currentUser!.id,
+                  };
+
+
+
+
+                  /// Subo el diccionario anteriormente creado
+                  /// a la base de datos
                   await supabase
                     .from('Pedido')
-                    .insert({
-                      'cliente': diccionarioPedido['cliente'],
-                      'fecha_pagado':  ( DateTime.timestamp().toIso8601String() ),
-                      'tiempoPreparacion': '15 min',
-                      'mesero': diccionarioPedido['mesero'],
-                      'id_mesa': diccionarioPedido['mesa'],
-                      'paraLlevar': diccionarioPedido['paraLlevar'],
-                      'identificador_manual': manualId,
-                  });
+                    .insert( diccionarioPedido );
+
+                  
 
 
-                  final dataPedidoId = await supabase
+                  /// Consigo el todas las columnas del pedido
+                  /// recientemente subido a la base de datos
+                  final dataPedido = await supabase
                     .from('Pedido')
-                    .select('id')
+                    .select()
                     .eq('identificador_manual', manualId)
                   ;
 
+                  /// Relaciono el pedido con los platillos que 
+                  /// se hayan ordenado, usando el id del pedido
+                  relacionarPedidoPlatillo( dataPedido[0]['id'] , ref.watch(riverpodPlatillosHashSet)  );
 
-                  relacionarPedidoPlatillo( dataPedidoId[0]['id']  , ref.watch(riverpodPlatillosHashSet) );
 
-                  //const meter a gregar a diccionario;
+
+                  /// Ahora, ese diccionario que creamos hace un
+                  /// momento, se va a reemplazar por lo que sea
+                  /// que hayamos guardado en la base de datos. Esto
+                  /// porque hay variables que nos faltan y que
+                  /// asigna la base de datos automaticamente
+                  diccionarioPedido = dataPedido[0];
+
+                
+                  /// Ahora, ese diccionario que creamos hace un 
+                  /// instante, lo vamos a meter en el riverpodListPedidos
+                  /// PERO, antes se debe añadir una cosita que nos permite
+                  /// mostrar en forma de string los platillos que se 
+                  /// pidieron en este pedido. Este string se guardará en
+                  /// la key 
+                  diccionarioPedido['platillosListaString'] = toStringPlatillos( ref.watch(riverpodPlatillosHashSet) );
+
+
+
+                  /// Ahora, sí vamos a insertar ese diccionario
+                  /// dentro del riverpod
                   ref.read(riverpodListaPedidos).addDictionary( diccionarioPedido );
 
 
+
+                  /// Imprimimos la variable para ver si todo bien
+                 for( var i = 0; i < ref.watch(riverpodListaPedidos).listaPedidos.length; i++ )
+                  {
+                    print("\n\n================= riverpodListPedidos en indice $i es: ${ref.watch(riverpodListaPedidos).listaPedidos[i]} ================= \n\n");
+                  }
+
+
                   ref.read(riverpodPlatillosHashSet.notifier).state = HashSet();
+                  
+                 
                   Navigator.pop(context);
                 },
                 
@@ -302,41 +353,80 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   ),
                 ),
               ),
-
               
             ],
           ),
         ],
-
       ),
-
     );
-
+    
   }
 
 
   Future<void> initialiceTableDropDownItems() async {
 
-    WidgetsFlutterBinding.ensureInitialized();
-
+    /// Primero, nos conectamos con la base de datos
     final supabase = Supabase.instance.client;
 
+
+    /// Luego, creamos una lista que va a almacenar
+    /// los dropdowmMenuItems que se crearan con el 
+    /// id de las mesas que NO se encuentren ocupadas.
     final List<DropdownMenuItem<int>> mesaItems = [];
 
+
+    /// Para obtener, unicamente, las mesas que no 
+    /// se encuentren ocupadas, se hace una consulta
+    /// a la base de datos que le pregunta a la 
+    /// tabla "Mesa" por la columna "id" de aquellas
+    /// mesas cuya columna "esta_ocupada" sea igual a 
+    /// false
     final mesaData = await supabase
       .from('Mesa')
-      .select('id');
+      .select('id')
+      .eq('esta_ocupada', false);
 
+
+
+    /// Tras esto, creamos una lista simple
+    /// que se va a usar unicamente para
+    /// ordenar los id de las mesas que no
+    /// esten ocupadas de manera ascendente
+    List listaDeIdDeMesa = [];
+
+
+
+    /// Asignamos cada uno de los id a
+    /// una posicion en la lista anteriormente
+    /// creada
     for( var i = 0; i < mesaData.length; i++ )
     {
-        print('\n++++++++++++++++++++++++mesaData[$i][id] = ${mesaData[i]['id']}++++++++++++++++++++++++\n');
-        mesaItems.add(
+      listaDeIdDeMesa.add( mesaData[i]['id'] );
+    }
+
+
+
+
+    /// Luego, hacemos sort a la lista
+    listaDeIdDeMesa.sort();
+
+    for( var i = 0; i < listaDeIdDeMesa.length; i++ )
+    {
+      
+      print('\n++++++++++++++++++++++++mesaData[$i][id] = ${mesaData[i]['id']}++++++++++++++++++++++++\n');
+      
+      /// Finalmente, añadimos secuencialmente o 
+      /// consecutivamente a la lista de  dropdownmenuitem
+      /// los elementos que se encuentren dentro de la
+      /// lista que ordenamos ascendentemenete. De esta
+      /// forma, siempre se desplegarán los elementos
+      /// ordenados de manera ascendente
+      mesaItems.add(
         DropdownMenuItem(
-          value: mesaData[i]['id'],
-          child: Text('Mesa ${mesaData[i]['id']}'.toString()),
+          value: listaDeIdDeMesa[i],
+          child: Text('Mesa ${listaDeIdDeMesa[i]}'.toString()),
         ),
       );
-
     }
 
     print('mesaItems es: $mesaItems');
@@ -347,6 +437,62 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
   } 
 
+    /// Debido a que este script solo debería ser alcanzable
+  /// por una cuenta que sea de tipo "mesero", en esta varible
+  /// se almacena el nombre del mesero que esté usando la cuenta.
+  /// Revisar función obtenerNombreMesero()
+  String nombreMesero = '';
+
+  
+  Future<void> obtenerNombreMesero() async {
+    
+    /// Primero, inicializo una conexión con la base de datos
+    final supabase = Supabase.instance.client;
+    
+    /// Tras esto, uso esa conexión para ver si hay
+    /// algún usuario cuya sesión esté actualmente activa.
+    /// Es decir, si hay algun empleado usando la 
+    /// aplicación en este momento
+    final User user = supabase.auth.currentUser!;
+
+
+    /// ese usuario tiene un ID asociado. uso ese
+    /// id para buscar en la tabla "empleado" al
+    /// usuario con este ID asociado. Cuando lo 
+    /// encuentro, obtengo el ID persona asociado
+    /// a este empleado
+    final idPersonaDeEmpleado = await supabase
+      .from('empleado')
+      .select('id_persona')
+      .eq('id_user', user.id);
+
+
+    /// Con este ID_persona adquirido, hago una
+    /// consulta en la base de datos en la tabla
+    /// "persona" para averiguar cual es el nombre
+    /// del empleado que tiene su sesión actualmente
+    /// activa.
+    final nombreEmpleado = await supabase
+      .from('persona')
+      .select('nombre_completo')
+      .eq('id', idPersonaDeEmpleado[0]['id_persona']);
+
+
+
+    setState(() {
+      /// Ahora, este nombre es asignado a la variable
+      /// "nombreMesero" que le pertenece a este script.
+      /// De esta forma se obtiene el nombre que este tiene
+      /// en todo momento
+      _mesero = nombreEmpleado[0]['nombre_completo'];
+    });
+    /// Finalmente, lo muestro con un print...
+    /// porque sí. es facil de debugear
+    print("\n\n======================= El mesero es: ${_mesero} =======================\n\n");
+
+    
+
+  }
 
 }
 
@@ -368,11 +514,29 @@ String toStringPlatillos(HashSet<Map<String,dynamic>> hashSetDePlatillos ){
   String aux = '';
 
   
-    for (var element in hashSetDePlatillos) {
-        aux = aux + '${element['nombre']} (X${element['cantidad']}), '.toString();
-       }
+  for(var element in hashSetDePlatillos) {
+    aux = aux + '${element['nombre']} (X${element['cantidad']}), '.toString();
+    
+  }
+
 
     return aux;
+}
+
+int calcularPrecioTotalPedido(HashSet<Map<String,dynamic>> hashSetDePlatillos ){
+  
+  int precioTotal = 0;
+
+  for( var element in hashSetDePlatillos ){
+
+    precioTotal = precioTotal + toInt(  element['precio_unitario'] * element['cantidad'] )!;
+
+  }
+
+  print("\n\n===============================El precio total de los platillos es: ${precioTotal}===============================\n\n");
+
+  return precioTotal;
+
 }
 
 String createRandomString(int length) {
@@ -391,8 +555,11 @@ Future<void> relacionarPedidoPlatillo( int idPedido, HashSet<Map<String, dynamic
         .insert({
           'id_pedido': idPedido,
           'id_platillo': element['id'],
+          'cantidad': element['cantidad']
         })
       ;
     }
   );
+
+  
 }

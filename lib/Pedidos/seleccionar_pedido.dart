@@ -10,10 +10,16 @@ class SeleccionarPedido extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         
+        centerTitle: true,
+
+        iconTheme: const IconThemeData(
+          color: EsquemaDeColores.onPrimary
+        ),
+
         title: const Text(
-            'Tomar Pedido',
-            style: TextStyle( color: EsquemaDeColores.onPrimary),
-          ),
+          'Tomar Pedido',
+          style: TextStyle( color: EsquemaDeColores.onPrimary),
+        ),
 
         backgroundColor: EsquemaDeColores.primary,
       ),

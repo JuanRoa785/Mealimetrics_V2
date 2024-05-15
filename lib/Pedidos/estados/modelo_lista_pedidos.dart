@@ -16,6 +16,10 @@ class RiverpodModel extends ChangeNotifier{
     notifyListeners();
   }
 
+  void set( List<Map<String, dynamic>> lista ){
+    listaPedidos = lista;
+  }
+
 }
 
 //Luego creo el notifierprovider para manejar esos cambios
