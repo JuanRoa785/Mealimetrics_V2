@@ -375,22 +375,19 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
       .from('Mesa')
       .select('''
       id,
-      esta_ocupada
-      ''');
+      ''')
+      .eq('esta_ocupada', false);
 
     for( var i = 0; i < mesaData.length; i++ )
     {
       print('\n++++++++++++++++++++++++mesaData[$i][id] = ${mesaData[i]['id']}++++++++++++++++++++++++\n');
       
-      if( mesaData[i]['esta_ocupada'] != true )
-      {
-        mesaItems.add(
-          DropdownMenuItem(
-            value: mesaData[i]['id'],
-            child: Text('Mesa ${mesaData[i]['id']}'.toString()),
-          ),
-        );
-      }
+      mesaItems.add(
+        DropdownMenuItem(
+          value: mesaData[i]['id'],
+          child: Text('Mesa ${mesaData[i]['id']}'.toString()),
+        ),
+      );
     }
 
     print('mesaItems es: $mesaItems');
