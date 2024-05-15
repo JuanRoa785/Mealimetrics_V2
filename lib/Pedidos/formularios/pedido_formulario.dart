@@ -373,19 +373,25 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
     final mesaData = await supabase
       .from('Mesa')
-      .select('''
-      id,
-      ''')
+      .select('id')
       .eq('esta_ocupada', false);
 
+    List listaDeIdDeMesa = [];
+
     for( var i = 0; i < mesaData.length; i++ )
+    {
+      listaDeIdDeMesa[i] = mesaData[i]['id'];
+    }
+
+
+    for( var i = 0; i < listaDeIdDeMesa.length; i++ )
     {
       print('\n++++++++++++++++++++++++mesaData[$i][id] = ${mesaData[i]['id']}++++++++++++++++++++++++\n');
       
       mesaItems.add(
         DropdownMenuItem(
-          value: mesaData[i]['id'],
-          child: Text('Mesa ${mesaData[i]['id']}'.toString()),
+          value: listaDeIdDeMesa[i],
+          child: Text('Mesa ${listaDeIdDeMesa[i]}'.toString()),
         ),
       );
     }
