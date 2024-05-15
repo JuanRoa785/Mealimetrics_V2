@@ -383,6 +383,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
       listaDeIdDeMesa[i] = mesaData[i]['id'];
     }
 
+    listaDeIdDeMesa.sort();
 
     for( var i = 0; i < listaDeIdDeMesa.length; i++ )
     {
