@@ -365,30 +365,62 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
   Future<void> initialiceTableDropDownItems() async {
 
-    WidgetsFlutterBinding.ensureInitialized();
-
+    /// Primero, nos conectamos con la base de datos
     final supabase = Supabase.instance.client;
 
+
+    /// Luego, creamos una lista que va a almacenar
+    /// los dropdowmMenuItems que se crearan con el 
+    /// id de las mesas que NO se encuentren ocupadas.
     final List<DropdownMenuItem<int>> mesaItems = [];
 
+
+    /// Para obtener, unicamente, las mesas que no 
+    /// se encuentren ocupadas, se hace una consulta
+    /// a la base de datos que le pregunta a la 
+    /// tabla "Mesa" por la columna "id" de aquellas
+    /// mesas cuya columna "esta_ocupada" sea igual a 
+    /// false
     final mesaData = await supabase
       .from('Mesa')
       .select('id')
       .eq('esta_ocupada', false);
 
+
+
+    /// Tras esto, creamos una lista simple
+    /// que se va a usar unicamente para
+    /// ordenar los id de las mesas que no
+    /// esten ocupadas de manera ascendente
     List listaDeIdDeMesa = [];
 
+
+
+    /// Asignamos cada uno de los id a
+    /// una posicion en la lista anteriormente
+    /// creada
     for( var i = 0; i < mesaData.length; i++ )
     {
-      listaDeIdDeMesa[i] = mesaData[i]['id'];
+      listaDeIdDeMesa.add( mesaData[i]['id'] );
     }
 
+
+
+
+    /// Luego, hacemos sort a la lista
     listaDeIdDeMesa.sort();
 
     for( var i = 0; i < listaDeIdDeMesa.length; i++ )
     {
+      
       print('\n++++++++++++++++++++++++mesaData[$i][id] = ${mesaData[i]['id']}++++++++++++++++++++++++\n');
       
+      /// Finalmente, añadimos secuencialmente o 
+      /// consecutivamente a la lista de  dropdownmenuitem
+      /// los elementos que se encuentren dentro de la
+      /// lista que ordenamos ascendentemenete. De esta
+      /// forma, siempre se desplegarán los elementos
+      /// ordenados de manera ascendente
       mesaItems.add(
         DropdownMenuItem(
           value: listaDeIdDeMesa[i],
