@@ -257,12 +257,22 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
 
   void showCircularProgressIndicator() async {
 
-    print("\n\n\n\n\nENTRÓ\n\n\n\n\n");
     showDialog(
       context: context, 
       builder: ((context) {
         
-        return const Center( child: CircularProgressIndicator() );
+        /// Ponerle el absorbponiter permite
+        /// que los taps que hayan encima de la
+        /// pantalla serán absorbidos por el 
+        /// AbsorbPointer en lugar de por la
+        /// pantalla, lo que impide que el usuario
+        /// se salga de la barra circular de 
+        /// carga a propósito
+        return const AbsorbPointer(
+          child: Center(
+            child: CircularProgressIndicator(),
+          )
+        );
 
       })
     );
