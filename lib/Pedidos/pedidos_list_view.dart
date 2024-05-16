@@ -4,6 +4,7 @@ import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'estados\\modelo_lista_pedidos.dart';
 import '..\\Styles\\color_scheme.dart';
+import 'package:flutter/scheduler.dart';
 
 
 class PedidosListView extends ConsumerStatefulWidget{
@@ -24,7 +25,9 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
     obtenerIdMesero();
 
     obtenerPedidosIniciales();
+
   }
+
 
   @override
   Widget build( BuildContext context ){
@@ -36,7 +39,8 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
           vertical: 23.0,
         ),
 
-        children: ref.watch(riverpodListaPedidos).listaPedidos.map( (pedido) => pedidoCard(pedido)).toList(),
+        children: ref.watch(riverpodListaPedidos).listaPedidos.map( (pedido) => pedidoCard(pedido) ).toList(),
+        
 
                  
       ),
@@ -124,7 +128,15 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
     );
   }
 
-  Future<void> obtenerPedidosIniciales() async{
+  Future<void> obtenerPedidosIniciales() async {
+
+    /// Primero, antes que nada, se añade una función para
+    /// mostrar una barra circular de carga antes de mostrar 
+    /// los pedidos en su respectiva lista de cards. Se usa
+    /// "Widgets.Binding.instance.addPostFrameCallback" para
+    /// asegurarse de que la función corra, inmediatamente
+    /// después de que el widget sea construido/cargado
+    WidgetsBinding.instance.addPostFrameCallback( (_) => showCircularProgressIndicator() );
 
     ///En esta variable se va a almacenar el string
     ///final que se va a poner en las cards de la aplicación.
@@ -208,6 +220,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
 
         print('\n\Final text for pedido: $aux\n');
 
+      
     }
 
 
@@ -218,6 +231,12 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
       /// sobre cada pedido, se hace la asignación al riverpodListaPedidos
       ref.read(riverpodListaPedidos).set( listaDePedidosDeActualMesero );
 
+      /// Finalmente, al final de toda la función, se hace
+      /// "pop" del contexto en el que nos encontrabamos...
+      /// es decir, de la barra circular de carga en la que
+      /// nos encontrabamos anteriormente
+      Navigator.pop( context );
+      
     });
    
   }
@@ -237,6 +256,18 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
   }
 
 
+  void showCircularProgressIndicator() async {
+
+    print("\n\n\n\n\nENTRÓ\n\n\n\n\n");
+    showDialog(
+      context: context, 
+      builder: ((context) {
+        
+        return const Center( child: CircularProgressIndicator() );
+
+      })
+    );
+  }
 
 }
 
