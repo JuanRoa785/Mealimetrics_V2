@@ -20,6 +20,7 @@ class _GestionMenuState extends State<GestionMenu>{
   List<Map<String, dynamic>> platillos = [];
   List<Map<String, dynamic>> principios = [];
   List<Map<String, dynamic>> complementos = [];
+  List<Map<String, dynamic>> platillosFiltrados = [];
 
   @override
   void initState() {
@@ -118,68 +119,82 @@ class _GestionMenuState extends State<GestionMenu>{
                   onPressed: () async {
                     final String nombre = platilloController.text.trim();
                     if (nombre == '') {
-                      showCustomErrorDialog(context, '¡Digite una palabra clave en el buscador!');
-                      cargarPlatillos();
+                      showCustomErrorDialog(
+                          context, '¡Digite una palabra clave en el buscador!');
+                      setState(() {
+                        platillosFiltrados = [];
+                      });
                       return;
                     }
-                    List<Map<String, dynamic>> platillosFiltrados;
+                    List<Map<String, dynamic>> platillosConFiltros;
                     switch (filtro) {
                       case 'principios':
-                          platillosFiltrados = await supabase
-                            .from('Platillo')
-                            .select()
-                            .or('categoria_alimenticia.eq.Principio, categoria_alimenticia.eq.Complemento')
-                            .ilike('nombre', '%$nombre%');
-                          
-                          if(platillosFiltrados.isEmpty){
-                            showCustomErrorDialog(context, "¡No hay ningun plato que tenga en su nombre: '$nombre'!");
-                            cargarPlatillos();
-                            platilloController.clear();
-                            return;
-                          }
+                        platillosConFiltros = principios
+                            .where((platillo) => platillo['nombre']
+                                .toString()
+                                .toLowerCase()
+                                .contains(nombre.toLowerCase()))
+                            .toList();
 
+                        if (platillosConFiltros.isEmpty) {
+                          showCustomErrorDialog(context,
+                              "¡No hay ningun plato que tenga en su nombre: '$nombre'!");
                           setState(() {
-                            principios = platillosFiltrados;
+                            platillosFiltrados = [];
                           });
-                          break;
+                          platilloController.clear();
+                        }
 
-                        case 'seco':
-                          platillosFiltrados = await supabase
-                            .from('Platillo')
-                            .select()
-                            .eq('categoria_alimenticia', 'Seco')
-                            .ilike('nombre', '%$nombre%');
-                          
-                          if(platillosFiltrados.isEmpty){
-                            showCustomErrorDialog(context, "¡No hay ningun plato que tenga en su nombre: '$nombre'!");
-                            cargarPlatillos();
-                            platilloController.clear();
-                            return;
-                          }
+                        setState(() {
+                          platillosFiltrados = platillosConFiltros;
+                        });
+                        break;
 
+                      case 'seco':
+                        platillosConFiltros = platillos
+                            .where((platillo) => platillo['nombre']
+                                .toString()
+                                .toLowerCase()
+                                .contains(nombre.toLowerCase()))
+                            .toList();
+
+                        if (platillosConFiltros.isEmpty) {
+                          showCustomErrorDialog(context,
+                              "¡No hay ningun plato que tenga en su nombre: '$nombre'!");
                           setState(() {
-                            platillos = platillosFiltrados; 
+                            platillosFiltrados = [];
                           });
-                          break; 
+                          platilloController.clear();
+                          return;
+                        }
+
+                        setState(() {
+                          platillosFiltrados = platillosConFiltros;
+                        });
+                        break;
 
                       case 'bebidas':
-                          platillosFiltrados = await supabase
-                            .from('Platillo')
-                            .select()
-                            .or('categoria_alimenticia.eq.Bebida, categoria_alimenticia.eq.Sopa')
-                            .ilike('nombre', '%$nombre%');
-                          
-                          if(platillosFiltrados.isEmpty){
-                            showCustomErrorDialog(context, "¡No hay ningun plato que tenga en su nombre: '$nombre'!");
-                            cargarPlatillos();
-                            platilloController.clear();
-                            return;
-                          }
+                        platillosConFiltros = complementos
+                            .where((platillo) => platillo['nombre']
+                                .toString()
+                                .toLowerCase()
+                                .contains(nombre.toLowerCase()))
+                            .toList();
 
+                        if (platillosConFiltros.isEmpty) {
+                          showCustomErrorDialog(context,
+                              "¡No hay ningun plato que tenga en su nombre: '$nombre'!");
                           setState(() {
-                            complementos = platillosFiltrados; // Actualizar la lista de platillos
-                          });  
-                          break; 
+                            platillosFiltrados = [];
+                          });
+                          platilloController.clear();
+                          return;
+                        }
+
+                        setState(() {
+                          platillosFiltrados = platillosConFiltros;
+                        });
+                        break;
                       default:
                     }
                   },
@@ -220,7 +235,7 @@ class _GestionMenuState extends State<GestionMenu>{
           ),
         ),
         Expanded(
-          child: _buildPlatillosList(platos),
+          child: _buildPlatillosList(platillosFiltrados.isEmpty ? platos : platillosFiltrados),
         ),
       ],
     );
@@ -579,6 +594,12 @@ class _GestionMenuState extends State<GestionMenu>{
                       }
 
                       Navigator.of(context).pop();
+                      //Reiniciamos los filtros (por si acaso)
+                      setState(() {
+                        platillosFiltrados = [];
+                      });
+                      platilloController.text = "";
+                      //recargamos los platillos desde la DB
                       cargarPlatillos();
                     } catch (e) {
                       showCustomErrorDialog(context, e.toString());
@@ -854,6 +875,12 @@ class _GestionMenuState extends State<GestionMenu>{
                       }
                       
                       Navigator.of(context).pop();
+                      //Reiniciamos los filtros
+                      setState(() {
+                        platillosFiltrados = [];
+                      });
+                      platilloController.text = "";
+                      //recargamos los platillos desde la DB
                       cargarPlatillos();
                     } catch (e) {
                       showCustomErrorDialog(context, e.toString());
