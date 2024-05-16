@@ -4,7 +4,6 @@ import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'estados\\modelo_lista_pedidos.dart';
 import '..\\Styles\\color_scheme.dart';
-import 'package:flutter/scheduler.dart';
 
 
 class PedidosListView extends ConsumerStatefulWidget{
