@@ -324,7 +324,14 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
                     ),
                     contentPadding: const EdgeInsets.symmetric(vertical: 3),
                   ),
-                  onChanged: (value) {},
+                  onChanged: (value) {
+                    if( value == '' )
+                    {
+                      setState(() {
+                        platillosFiltrados = [];
+                      });
+                    }
+                  },
                 ),
               ),
             ),
