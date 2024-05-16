@@ -55,7 +55,7 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
 
       setState(() {
         _listaDiccionariosDePlatillos = dataPlatillo;
-        
+
         /// Finalmente, al final de toda la función, se hace
         /// "pop" del contexto en el que nos encontrabamos...
         /// es decir, de la barra circular de carga en la que
@@ -97,14 +97,14 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
     return Card(
       
       elevation: 20,
-      margin: const EdgeInsets.only(left: 10, right: 10, top: 5),
+      margin: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(13.0)
       ),
       color: EsquemaDeColores.secondary,
 
       child: Container(
-        margin: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+        margin: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 12),
         height: 140.0,
         child: buildPlatilloCardInnerData( diccionarioPlatillo ),
       ),
@@ -176,7 +176,8 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
                 ///Dentro del expanded creamos una columna, porque la informacion
                 ///se va mostrar de arriba pa abajo
                 child: Column(
-          
+
+                  
                   crossAxisAlignment: CrossAxisAlignment.start,
           
                   ///Ahora, le decimos los textos que van a aparecer
@@ -237,11 +238,13 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
                         '\$${NumberFormat.decimalPattern("es_CO").format(diccionarioPlatillo['precio_unitario'])} COP',
                         style: const TextStyle( 
                           fontSize: 15,
-                          color: EsquemaDeColores.onPrimary
+                          fontWeight: FontWeight.bold,
+                          color: EsquemaDeColores.primary
                         ),
                       ),
                     ),
-          
+
+
                   ],
           
                 ),

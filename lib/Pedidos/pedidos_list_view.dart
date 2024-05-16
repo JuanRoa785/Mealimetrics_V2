@@ -118,7 +118,9 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
             Text(
               'Precio Total: \$${NumberFormat.decimalPattern("es_CO").format( pedido['precioTotal'] )} COP ',
               style: const TextStyle(
-                color: EsquemaDeColores.onPrimary,
+                color: EsquemaDeColores.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 15
               ),
             ),
           ],
