@@ -255,7 +255,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
   }
 
 
-  void showCircularProgressIndicator() async {
+  void showCircularProgressIndicator() {
 
     showDialog(
       context: context, 

@@ -35,7 +35,17 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
   
   // Para hacer read de los platillos en la bd
     Future<void> readPlatillosData() async {
-       WidgetsFlutterBinding.ensureInitialized();
+
+      /// Primero, antes que nada, se añade una función para
+      /// mostrar una barra circular de carga antes de mostrar 
+      /// los pedidos en su respectiva lista de cards. Se usa
+      /// "Widgets.Binding.instance.addPostFrameCallback" para
+      /// asegurarse de que la función corra, inmediatamente
+      /// después de que el widget sea construido/cargado
+      WidgetsBinding.instance.addPostFrameCallback( (_) => showCircularProgressIndicator() );
+
+
+      WidgetsFlutterBinding.ensureInitialized();
 
       final supabase = Supabase.instance.client;
 
@@ -45,7 +55,12 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
 
       setState(() {
         _listaDiccionariosDePlatillos = dataPlatillo;
-
+        
+        /// Finalmente, al final de toda la función, se hace
+        /// "pop" del contexto en el que nos encontrabamos...
+        /// es decir, de la barra circular de carga en la que
+        /// nos encontrabamos anteriormente
+        Navigator.pop( context );
       });
     }
 
@@ -252,6 +267,30 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
       ),
     );
 
+  }
+
+
+  void showCircularProgressIndicator() {
+
+    showDialog(
+      context: context, 
+      builder: ((context) {
+        
+        /// Ponerle el absorbponiter permite
+        /// que los taps que hayan encima de la
+        /// pantalla serán absorbidos por el 
+        /// AbsorbPointer en lugar de por la
+        /// pantalla, lo que impide que el usuario
+        /// se salga de la barra circular de 
+        /// carga a propósito
+        return const AbsorbPointer(
+          child: Center(
+            child: CircularProgressIndicator(),
+          )
+        );
+
+      })
+    );
   }
 
 
