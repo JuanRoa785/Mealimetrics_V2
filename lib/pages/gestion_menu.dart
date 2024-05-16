@@ -875,7 +875,7 @@ class _GestionMenuState extends State<GestionMenu>{
                       }
                       
                       Navigator.of(context).pop();
-                      //Reiniciamos los filtros
+                      //Reiniciamos los filtros por si acaso
                       setState(() {
                         platillosFiltrados = [];
                       });
@@ -960,13 +960,19 @@ class _GestionMenuState extends State<GestionMenu>{
                 try {
                   await supabase.storage.from('platillos').remove(['IDPlatillo/$idPlatillo/imagenPlatillo']);
                   Navigator.of(context).pop();
-                  setState(() {
-                    cargarPlatillos();
-                  });
                 } catch (e) {
                   showCustomErrorDialog(context, e.toString());
                   return;
                 }
+                  //Reiniciamos los filtros por si acaso
+                  setState(() {
+                    platillosFiltrados = [];
+                  });
+                  platilloController.text = "";
+                  //recargamos los platillos desde la DB
+                  setState(() {
+                    cargarPlatillos();
+                  });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red, 
