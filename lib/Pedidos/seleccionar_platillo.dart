@@ -17,22 +17,33 @@ class SeleccionarPlatillo extends ConsumerStatefulWidget {
   _SeleccionarPlatilloState createState() => _SeleccionarPlatilloState();
 }
 
-class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
+class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with SingleTickerProviderStateMixin {
   final TextEditingController platilloController = TextEditingController();
   List<Map<String, dynamic>> platillos = [];
   List<Map<String, dynamic>> principios = [];
   List<Map<String, dynamic>> complementos = [];
   List<Map<String, dynamic>> platillosFiltrados = [];
   final HashSet<Map<String, dynamic>> _platillosSeleccionados = HashSet();
+  late TabController tabController;
 
   @override
   void initState() {
     super.initState();
+    tabController = TabController(vsync: this, length: 3);
+    tabController.addListener(handleTabChange);
 
     /// con esta funcion vamos a la base de datos y
     /// hacemos "fetch" a la informacion sobre todos
     /// los platillos que el negocio tenga a la venta
     readPlatillosData();
+  }
+
+  //Función para reiniciar los filtros al cambiar de pestaña
+  void handleTabChange() {
+    platilloController.clear();
+    setState(() {
+      platillosFiltrados = [];
+    });
   }
 
   // Para hacer read de los platillos en la bd
@@ -260,8 +271,9 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
                   const Size.fromHeight(40), // Eliminar espacio adicional
               child: Container(
                 color: EsquemaDeColores.primary,
-                child: const TabBar(
-                  tabs: [
+                child: TabBar(
+                  controller: tabController,
+                  tabs: const [
                     Tab(icon: Icon(Icons.rice_bowl, color: EsquemaDeColores.onPrimary) ),
                     Tab(icon: Icon(Icons.local_dining, color: EsquemaDeColores.onPrimary)),
                     Tab(icon: Icon(Icons.local_drink, color: EsquemaDeColores.onPrimary)),
@@ -271,6 +283,7 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
             ),
           ),
           body: TabBarView(
+            controller: tabController,
             children: [
               _buildListView(principios, 'principios'),
               _buildListView(platillos, 'seco'),
@@ -298,7 +311,8 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> {
               ),
             ),
           ),
-        ));
+        )
+      ); 
   }
 
   Widget _buildListView(List<Map<String, dynamic>> dataList, String filtro) {
