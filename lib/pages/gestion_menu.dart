@@ -31,17 +31,20 @@ class _GestionMenuState extends State<GestionMenu>{
     final dataPlatos = await supabase
                   .from('Platillo')
                   .select()
-                  .eq('categoria_alimenticia', 'Seco');
+                  .eq('categoria_alimenticia', 'Seco')
+                  .order('nombre', ascending: true);
 
     final dataPrinc = await supabase
                   .from('Platillo')
                   .select()
-                  .or('categoria_alimenticia.eq.Principio, categoria_alimenticia.eq.Complemento');
+                  .or('categoria_alimenticia.eq.Principio, categoria_alimenticia.eq.Complemento')
+                  .order('nombre', ascending: true);
 
     final dataComp = await supabase
                   .from('Platillo')
                   .select()
-                  .or('categoria_alimenticia.eq.Bebida, categoria_alimenticia.eq.Sopa');
+                  .or('categoria_alimenticia.eq.Bebida, categoria_alimenticia.eq.Sopa')
+                  .order('categoria_alimenticia', ascending: true);
     
     setState(() {
       platillos = dataPlatos;
