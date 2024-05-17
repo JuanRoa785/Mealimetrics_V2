@@ -568,7 +568,6 @@ List<DropdownMenuItem<bool>> buildListaParaLlevar() {
 String toStringPlatillos(HashSet<Map<String,dynamic>> hashSetDePlatillos ){
   String aux = '';
 
-  
   for(var element in hashSetDePlatillos) {
     aux = aux + '${element['nombre']} (X${element['cantidad']}), '.toString();
     
