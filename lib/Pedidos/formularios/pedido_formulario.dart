@@ -573,8 +573,11 @@ String toStringPlatillos(HashSet<Map<String,dynamic>> hashSetDePlatillos ){
     
   }
 
-  aux = aux.substring(0, aux.length - 2);
-
+  if( aux.length >= 2 )
+  {
+    aux = aux.substring(0, aux.length - 2);
+  }
+  
   return aux;
 }
 
