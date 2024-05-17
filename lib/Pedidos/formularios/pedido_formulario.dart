@@ -18,7 +18,7 @@ class PedidoFormulario extends ConsumerStatefulWidget {
 
 class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
-  String? _cliente;
+  String _cliente = '';
   String? _mesero;
   int? _mesa;
   List<DropdownMenuItem<int>> _tableDropDownMenuItems = [];
@@ -28,6 +28,8 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
   @override
   void initState(){
     initialiceTableDropDownItems();
+
+    test();
 
     obtenerNombreMesero();
 
@@ -491,6 +493,18 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
     print("\n\n======================= El mesero es: ${_mesero} =======================\n\n");
 
     
+
+  }
+
+  void test(){
+
+    if( _mesero == '' )
+    {
+      print("\n\n\n\n\n IT IS NULL \n\n\n\n");
+    }
+    else{
+      print("\n\n\n\nWTF\n\n\n\n");
+    }
 
   }
 
