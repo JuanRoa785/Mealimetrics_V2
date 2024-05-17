@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mealimetrics/Pedidos/Excepciones/excpeciones_pedido_formulario.dart';
 import 'package:mealimetrics/Pedidos/estados/cuantos_platillos_quiere.dart';
 import 'package:mealimetrics/Pedidos/estados/modelo_lista_pedidos.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
@@ -249,12 +250,16 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   try{
                     verifyFormVariables();
                   }
-                  on Exception catch (e) {
+                  on AValuesIsMissingException catch (e) {
                     showCustomErrorDialog(
                       context, 
                       'Por favor, rellene todos los campos del formulario. Campos faltantes: ${e.mensaje}'
                     );
 
+                    return;
+                  }
+                  catch (e) {
+                    print("hubo una excepcion: ${e.toString()}");
                     return;
                   }
 
@@ -532,7 +537,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
       aValueIsMissing = true;
       mensaje = '$mensaje¿El platillo es para llevar? - ';
     }
-    else if( ref.watch(riverpodPlatillosHashSet).isEmpty ){
+    if( ref.watch(riverpodPlatillosHashSet).isEmpty ){
       aValueIsMissing = true;
       mensaje = '${mensaje}No ha seleccionado ningún pedido - ';
     }
