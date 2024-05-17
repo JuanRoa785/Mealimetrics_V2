@@ -542,9 +542,8 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
       mensaje = '${mensaje}No ha seleccionado ningún pedido - ';
     }
 
-    mensaje = mensaje.substring(0, mensaje.length - 3);
-
     if( aValueIsMissing ){
+      mensaje = mensaje.substring(0, mensaje.length - 3);
       throw  AValuesIsMissingException(mensaje);
     }
 
