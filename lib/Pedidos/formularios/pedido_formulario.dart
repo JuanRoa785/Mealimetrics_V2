@@ -18,7 +18,7 @@ class PedidoFormulario extends ConsumerStatefulWidget {
 
 class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
-  String _cliente = '';
+  String? _cliente;
   String? _mesero;
   int? _mesa;
   List<DropdownMenuItem<int>> _tableDropDownMenuItems = [];
