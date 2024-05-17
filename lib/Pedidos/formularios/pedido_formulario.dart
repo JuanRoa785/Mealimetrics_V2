@@ -253,7 +253,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   on AValuesIsMissingException catch (e) {
                     showCustomErrorDialog(
                       context, 
-                      'Por favor, rellene todos los campos del formulario. Campos faltantes: ${e.mensaje}'
+                      'Por favor, rellene todos los campos del formulario. Campos faltantes:\n${e.mensaje}'
                     );
 
                     return;
@@ -520,30 +520,30 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
     if( _cliente == '' )
     {
       aValueIsMissing = true;
-      mensaje = '${mensaje}Nombre del cliente - ';
+      mensaje = '${mensaje}Nombre del cliente\n';
     }
     if( _mesero == '' )
     {
       aValueIsMissing = true;
-      mensaje = '${mensaje}Nombre del mesero - ';
+      mensaje = '${mensaje}Nombre del mesero\n';
     }
     if( _mesa == null )
     {
       aValueIsMissing = true;
-      mensaje = '${mensaje}Número de la mesa - ';
+      mensaje = '${mensaje}Número de la mesa\n';
     }
     if( _paraLlevar == null )
     {
       aValueIsMissing = true;
-      mensaje = '$mensaje¿El platillo es para llevar? - ';
+      mensaje = '$mensaje¿El platillo es para llevar?\n';
     }
     if( ref.watch(riverpodPlatillosHashSet).isEmpty ){
       aValueIsMissing = true;
-      mensaje = '${mensaje}No ha seleccionado ningún pedido - ';
+      mensaje = '${mensaje}No ha seleccionado ningún platillo\n';
     }
 
     if( aValueIsMissing ){
-      mensaje = mensaje.substring(0, mensaje.length - 3);
+      mensaje = mensaje.substring(0, mensaje.length - 1);
       throw  AValuesIsMissingException(mensaje);
     }
 
