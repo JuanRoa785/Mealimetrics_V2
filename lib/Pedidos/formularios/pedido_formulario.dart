@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mealimetrics/Pedidos/estados/cuantos_platillos_quiere.dart';
 import 'package:mealimetrics/Pedidos/estados/modelo_lista_pedidos.dart';
+import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '..\\..\\Styles\\color_scheme.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -19,7 +20,7 @@ class PedidoFormulario extends ConsumerStatefulWidget {
 class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
   String _cliente = '';
-  String? _mesero;
+  String _mesero = '';
   int? _mesa;
   List<DropdownMenuItem<int>> _tableDropDownMenuItems = [];
   bool? _paraLlevar;
@@ -28,8 +29,6 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
   @override
   void initState(){
     initialiceTableDropDownItems();
-
-    test();
 
     obtenerNombreMesero();
 
@@ -247,6 +246,18 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                 
                 onPressed: () async {
                   
+                  try{
+                    verifyFormVariables();
+                  }
+                  on Exception catch (e) {
+                    showCustomErrorDialog(
+                      context, 
+                      'Por favor, rellene todos los campos del formulario. Campos faltantes: ${e.mensaje}'
+                    );
+
+                    return;
+                  }
+
                   /// Primero, establecemos la conexión con
                   /// la base de datos
                   final supabase = Supabase.instance.client;
@@ -496,14 +507,40 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
   }
 
-  void test(){
+  verifyFormVariables(){
 
+    bool aValueIsMissing = false;
+    String mensaje = '';
+
+    if( _cliente == '' )
+    {
+      aValueIsMissing = true;
+      mensaje = '${mensaje}Nombre del cliente - ';
+    }
     if( _mesero == '' )
     {
-      print("\n\n\n\n\n IT IS NULL \n\n\n\n");
+      aValueIsMissing = true;
+      mensaje = '${mensaje}Nombre del mesero - ';
     }
-    else{
-      print("\n\n\n\nWTF\n\n\n\n");
+    if( _mesa == null )
+    {
+      aValueIsMissing = true;
+      mensaje = '${mensaje}Número de la mesa - ';
+    }
+    if( _paraLlevar == null )
+    {
+      aValueIsMissing = true;
+      mensaje = '$mensaje¿El platillo es para llevar? - ';
+    }
+    else if( ref.watch(riverpodPlatillosHashSet).isEmpty ){
+      aValueIsMissing = true;
+      mensaje = '${mensaje}No ha seleccionado ningún pedido - ';
+    }
+
+    mensaje = mensaje.substring(0, mensaje.length - 3);
+
+    if( aValueIsMissing ){
+      throw  AValuesIsMissingException(mensaje);
     }
 
   }
