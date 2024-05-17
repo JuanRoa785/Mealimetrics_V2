@@ -29,6 +29,7 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
   @override
   void initState() {
     super.initState();
+
     tabController = TabController(vsync: this, length: 3);
     tabController.addListener(handleTabChange);
 
@@ -36,6 +37,16 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
     /// hacemos "fetch" a la informacion sobre todos
     /// los platillos que el negocio tenga a la venta
     readPlatillosData();
+
+    WidgetsBinding.instance.addPostFrameCallback( (_) =>
+
+    /// vacío el hashSet. Para que el comportamiento de la 
+    /// página sea congruente con el hecho de que, al volver
+    /// a entrar a seleccionar platillos, los platillos que 
+    /// se seleccionen de nueva cuenta, sobreescribirán los antiguamente
+    /// seleccionados
+    ref.read(riverpodPlatillosHashSet.notifier).state = HashSet()
+    );
   }
 
   //Función para reiniciar los filtros al cambiar de pestaña
