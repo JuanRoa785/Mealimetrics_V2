@@ -574,8 +574,9 @@ String toStringPlatillos(HashSet<Map<String,dynamic>> hashSetDePlatillos ){
     
   }
 
+  aux = aux.substring(0, aux.length - 2);
 
-    return aux;
+  return aux;
 }
 
 int calcularPrecioTotalPedido(HashSet<Map<String,dynamic>> hashSetDePlatillos ){

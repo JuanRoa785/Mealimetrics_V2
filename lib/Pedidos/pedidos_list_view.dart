@@ -215,6 +215,8 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
 
         }
 
+        aux = aux.substring(0, aux.length - 2);
+        
         /// Se hace la asignación a una clave en la lista 
         /// de pedidos (estos pedidos son diccionarios).
         listaDePedidosDeActualMesero[i]['platillosListaString'] = aux;
