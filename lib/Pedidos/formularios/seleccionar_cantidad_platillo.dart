@@ -15,7 +15,7 @@ class SeleccionarCantidadPlatillos extends ConsumerStatefulWidget {
 
 class _SeleccionarCantidadPlatillosState extends ConsumerState<SeleccionarCantidadPlatillos> {
 
-  int? _cantidadDePlatillos;
+  int _cantidadDePlatillos = 0;
   final cuantosPlatillosController = TextEditingController();
     @override
   void dispose() {
@@ -99,7 +99,7 @@ class _SeleccionarCantidadPlatillosState extends ConsumerState<SeleccionarCantid
 
             }
             
-            ref.read(riverpodCuantosPlatillosQuiere.notifier).state = _cantidadDePlatillos!;
+            ref.read(riverpodCuantosPlatillosQuiere.notifier).state = _cantidadDePlatillos;
             
             Navigator.pop(context);
           }, 
