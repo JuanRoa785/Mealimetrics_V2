@@ -2,7 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mealimetrics/Pedidos/Excepciones/excpeciones_pedido_formulario.dart';
+import 'package:mealimetrics/Pedidos/Excepciones/pedido_formulario.dart';
 import 'package:mealimetrics/Pedidos/estados/cuantos_platillos_quiere.dart';
 import 'package:mealimetrics/Pedidos/estados/modelo_lista_pedidos.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
@@ -250,7 +250,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   try{
                     verifyFormVariables();
                   }
-                  on AValuesIsMissingException catch (e) {
+                  on AValueIsMissingException catch (e) {
                     showCustomErrorDialog(
                       context, 
                       'Por favor, rellene todos los campos del formulario. Campos faltantes:\n${e.mensaje}'
@@ -544,7 +544,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
     if( aValueIsMissing ){
       mensaje = mensaje.substring(0, mensaje.length - 1);
-      throw  AValuesIsMissingException(mensaje);
+      throw  AValueIsMissingException(mensaje);
     }
 
   }

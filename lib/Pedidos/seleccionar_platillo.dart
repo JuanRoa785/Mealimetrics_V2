@@ -141,10 +141,11 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
 
   InkWell buildPlatilloCardInnerData(Map<String, dynamic> diccionarioPlatillo) {
     return InkWell(
-      onTap: () async {
+      onTap: () {
         if (!_platillosSeleccionados.contains(diccionarioPlatillo)) {
-          await showDialog(
+          showDialog(
             context: context,
+            barrierDismissible: false,
             builder: (BuildContext context) {
               return const SeleccionarCantidadPlatillos();
             },
