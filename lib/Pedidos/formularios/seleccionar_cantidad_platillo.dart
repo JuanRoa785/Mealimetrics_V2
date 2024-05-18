@@ -16,6 +16,15 @@ class SeleccionarCantidadPlatillos extends ConsumerStatefulWidget {
 class _SeleccionarCantidadPlatillosState extends ConsumerState<SeleccionarCantidadPlatillos> {
 
   int? _cantidadDePlatillos;
+  final cuantosPlatillosController = TextEditingController();
+    @override
+  void dispose() {
+    
+    super.dispose();
+
+    // Clean up the controller when the widget is disposed.
+    cuantosPlatillosController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +47,7 @@ class _SeleccionarCantidadPlatillosState extends ConsumerState<SeleccionarCantid
 
         TextField(
           enableInteractiveSelection: false,
+          controller: cuantosPlatillosController,
           keyboardType: TextInputType.number,
           autofocus: true,
           inputFormatters: <TextInputFormatter>[
@@ -111,10 +121,11 @@ class _SeleccionarCantidadPlatillosState extends ConsumerState<SeleccionarCantid
     bool aValueIsMissing = false;
     String mensaje = '';
 
-    if( _cantidadDePlatillos == null ){
+    if( cuantosPlatillosController.text == ''){
       aValueIsMissing = true;
       mensaje = 'Cantidad de platillos\n';
     }
+
 
     if( aValueIsMissing ){
         
