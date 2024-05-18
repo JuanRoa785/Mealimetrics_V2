@@ -29,7 +29,7 @@ class _SeleccionarCantidadPlatillosState extends ConsumerState<SeleccionarCantid
   @override
   Widget build(BuildContext context) {
     return  SimpleDialog(
-      backgroundColor: EsquemaDeColores.background,
+      backgroundColor: EsquemaDeColores.background, 
       contentPadding: const EdgeInsets.all(10),
       title: const Text(
         '¿Cuantos platillos desea?',
