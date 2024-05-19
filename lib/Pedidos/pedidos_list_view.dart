@@ -123,7 +123,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
                 ),
                 DropdownButton2<String>(
                   items: _listaDeEstadosDePedido,
-                  value: _estadoElegido,
+                  value: pedido['estado'],
                   onChanged: (String? value){
                     setState(() {
                       _estadoElegido = value;
