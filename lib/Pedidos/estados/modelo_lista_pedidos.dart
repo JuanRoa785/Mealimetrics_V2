@@ -31,6 +31,17 @@ class RiverpodModel extends ChangeNotifier{
     foundDictionary['estado'] = estado;
   }
 
+  void elimiarPedidoPorId( int id ){
+    
+    final foundDictionary = listaPedidos.firstWhere(
+      (element) {
+        return element['id'] == id;
+      }
+    );
+
+    listaPedidos.remove( foundDictionary );
+  }
+
 }
 
 //Luego creo el notifierprovider para manejar esos cambios

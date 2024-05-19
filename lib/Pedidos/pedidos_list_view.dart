@@ -119,10 +119,15 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
                   ),
                 ),
                 const SizedBox(
-                  width: 10,
+                  width: 5,
                 ),
                 DropdownButton2<String>(
                   items: _listaDeEstadosDePedido,
+                  style: const TextStyle(
+                    color: EsquemaDeColores.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                   value: pedido['estado'],
                   onChanged: (String? value) async {
                     final supabase =  Supabase.instance.client;
@@ -144,9 +149,11 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
                     setState(() {
 
                       ref.watch(riverpodListaPedidos).cambiarEstadoPorId(pedido['id'], value!);
+                      
+                      if( value == 'Pagado'){
+                        ref.watch(riverpodListaPedidos).elimiarPedidoPorId(pedido['id']);
+                      }
 
-
-                      print("\n\n\n\n\n===========Pedido cambiado: ${ref.read(riverpodListaPedidos).listaPedidos}===========\n\n\n\n\n");
                     });
                   },
                   
