@@ -2,6 +2,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'estados\\modelo_lista_pedidos.dart';
 import '..\\Styles\\color_scheme.dart';
@@ -123,13 +124,27 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
                 DropdownButton2<String>(
                   items: _listaDeEstadosDePedido,
                   value: pedido['estado'],
-                  onChanged: (String? value){
-                    setState(() async {
+                  onChanged: (String? value) async {
+                    final supabase =  Supabase.instance.client;
+
+                    try{
+                      await supabase
+                      .from('Pedido')
+                      .update({ 'estado': value })
+                      .match({'id': pedido['id']});
+                    }
+                    catch (e){
+                      showCustomErrorDialog(
+                        context, 
+                        e.toString()
+                      );
+                      return;
+                    }
+
+                    setState(() {
 
                       ref.watch(riverpodListaPedidos).cambiarEstadoPorId(pedido['id'], value!);
 
-
-                      
 
                       print("\n\n\n\n\n===========Pedido cambiado: ${ref.read(riverpodListaPedidos).listaPedidos}===========\n\n\n\n\n");
                     });
