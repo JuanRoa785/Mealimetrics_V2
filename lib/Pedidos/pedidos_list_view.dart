@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
@@ -16,6 +17,8 @@ class PedidosListView extends ConsumerStatefulWidget{
 class _PedidosListView extends ConsumerState<PedidosListView>{
 
   String _idMesero = '';
+  final List<DropdownMenuItem<String>> _listaDeEstadosDePedido = buildListaDeEstados();
+  String? _estadoElegido;
 
   @override
   void initState(){
@@ -106,12 +109,29 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
             const SizedBox(
               height: 5.0,
             ),
-            Text(
-              'Estado: ${pedido["estado"]}',
-              style: const TextStyle(
-                color: EsquemaDeColores.primary,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              children: <Widget>[
+                const Text(
+                  'Estado:',
+                  style: TextStyle(
+                    color: EsquemaDeColores.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                DropdownButton2<String>(
+                  items: _listaDeEstadosDePedido,
+                  value: _estadoElegido,
+                  onChanged: (String? value){
+                    setState(() {
+                      _estadoElegido = value;
+                    });
+                  },
+                  
+                ),
+              ]
             ),
             const SizedBox(
               height: 5.0,
@@ -292,8 +312,34 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
       })
     );
   }
-
+  
 }
+
+
+
+/// ====================================================================================
+/// ====================================================================================
+
+
+List<DropdownMenuItem<String>> buildListaDeEstados(){
+    List<String> listaDeEstados = ['Ordenado', 'Preparándose', 'Servido', 'Pagado'];
+    List<DropdownMenuItem<String>> retorno = [];
+
+    for( var i = 0; i < listaDeEstados.length; i++ ){
+
+      retorno.add(
+        DropdownMenuItem(
+          value: listaDeEstados[i],
+          child: Text(listaDeEstados[i]),
+        )
+      );
+
+    }
+
+    return retorno;
+    
+  }
+
 
 
 
