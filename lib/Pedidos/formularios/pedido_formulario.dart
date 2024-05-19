@@ -259,7 +259,6 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                       context, 
                       'Por favor, rellene todos los campos del formulario. Campos faltantes:\n${e.mensaje}'
                     );
-
                     return;
                   }
                   catch (e) {
@@ -294,6 +293,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                     'identificador_manual': manualId,
                     'precioTotal': calcularPrecioTotalPedido( ref.watch(riverpodPlatillosHashSet) ),
                     'id_mesero': supabase.auth.currentUser!.id,
+                    'estado': 'Ordenado',
                   };
 
 

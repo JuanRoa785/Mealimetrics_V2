@@ -107,6 +107,16 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
               height: 5.0,
             ),
             Text(
+              'Estado: ${pedido["estado"]}',
+              style: const TextStyle(
+                color: EsquemaDeColores.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(
+              height: 5.0,
+            ),
+            Text(
               'Platillos: ${pedido['platillosListaString']}',
               style: const TextStyle(
                 color: EsquemaDeColores.onPrimary,
@@ -154,7 +164,8 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
     final listaDePedidosDeActualMesero = await supabase
       .from('Pedido')
       .select()
-      .eq('id_mesero', _idMesero);
+      .eq('id_mesero', _idMesero)
+      .neq('estado', 'Pagado');
 
 
     /// Ahora, vamos a recorrer todos estos pedidos 
@@ -165,7 +176,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
       /// para el siguiente pedido
       aux = '';
 
-      print("\n\n++++++++++++++++++++++++++++ listaDePedidosActualMesero en indice $i tiene un id igual a: ${listaDePedidosDeActualMesero[i]['id']}  ++++++++++++++++++++++++++++\n\n");
+      print("\n\n++++++++++++++++++++++++++++ listaDePedidosActualMesero en indice $i tiene un estado igual a: ${listaDePedidosDeActualMesero[i]['estado']}  ++++++++++++++++++++++++++++\n\n");
 
       /// Para cada pedido, encontramos los platillos
       /// que se pidieron para ese pedido. Para esto
