@@ -18,7 +18,6 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
 
   String _idMesero = '';
   final List<DropdownMenuItem<String>> _listaDeEstadosDePedido = buildListaDeEstados();
-  String? _estadoElegido;
 
   @override
   void initState(){
@@ -125,9 +124,14 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
                   items: _listaDeEstadosDePedido,
                   value: pedido['estado'],
                   onChanged: (String? value){
-                    setState(() {
-                      _estadoElegido = value;
-                      print("\n\n\n\n\n===========Id del pedido en cuestión: ${pedido['id']}===========\n\n\n\n\n");
+                    setState(() async {
+
+                      ref.watch(riverpodListaPedidos).cambiarEstadoPorId(pedido['id'], value!);
+
+
+                      
+
+                      print("\n\n\n\n\n===========Pedido cambiado: ${ref.read(riverpodListaPedidos).listaPedidos}===========\n\n\n\n\n");
                     });
                   },
                   

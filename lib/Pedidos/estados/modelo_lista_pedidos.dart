@@ -20,6 +20,17 @@ class RiverpodModel extends ChangeNotifier{
     listaPedidos = lista;
   }
 
+  void cambiarEstadoPorId( int id, String estado ){
+
+    final foundDictionary = listaPedidos.firstWhere(
+      (element) {
+        return element['id'] == id;
+      }
+    );
+
+    foundDictionary['estado'] = estado;
+  }
+
 }
 
 //Luego creo el notifierprovider para manejar esos cambios
