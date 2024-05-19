@@ -127,6 +127,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
                   onChanged: (String? value){
                     setState(() {
                       _estadoElegido = value;
+                      print("\n\n\n\n\n===========Id del pedido en cuestión: ${pedido['id']}===========\n\n\n\n\n");
                     });
                   },
                   
