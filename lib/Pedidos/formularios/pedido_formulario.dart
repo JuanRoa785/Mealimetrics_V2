@@ -34,6 +34,10 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
     obtenerNombreMesero();
 
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback( 
+      (_) => ref.read(riverpodPlatillosHashSet.notifier).state = HashSet() 
+    );
   }
 
 
