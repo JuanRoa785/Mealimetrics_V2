@@ -129,26 +129,28 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                     fontSize: 19
                   ),
                 ),
-                DropdownButton<String>(
-                  value: estadoValue,
-                  dropdownColor: EsquemaDeColores.secondary,
-                  onChanged: (newEstado) {
-                    setState(() {
-                      estadoValue = newEstado!;
-                    });
-                  },
-                  items: estados.map((estado) {
-                    return DropdownMenuItem<String>(
-                      value: estado,
-                      child: Text(estado,
-                          style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.normal,
-                          fontSize: 19
-                          )
-                        ),
-                    );
-                  }).toList(),
+                DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: estadoValue,
+                    dropdownColor: EsquemaDeColores.secondary,
+                    onChanged: (newEstado) {
+                      setState(() {
+                        estadoValue = newEstado!;
+                      });
+                    },
+                    items: estados.map((estado) {
+                      return DropdownMenuItem<String>(
+                        value: estado,
+                        child: Text(estado,
+                            style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 19
+                            )
+                          ),
+                      );
+                    }).toList(),
+                  ),
                 ),
                 const Text(
                   'Rol:',
@@ -157,28 +159,30 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                     fontSize: 19
                   ),
                 ),
-                DropdownButton<String>(
-                  value: rolValue,
-                  dropdownColor: EsquemaDeColores.secondary,
-                  onChanged: (newRol) {
-                    setState(() {
-                      rolValue = newRol!;
-                    });
-                  },
-                  items: roles.map((rol) {
-                    return DropdownMenuItem<String>(
-                      value: rol,
-                      child: Text(
-                        rol,
-                        style: 
-                          const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.normal,
-                          fontSize: 19
-                          )
-                        ),
-                    );
-                  }).toList(),
+                DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: rolValue,
+                    dropdownColor: EsquemaDeColores.secondary,
+                    onChanged: (newRol) {
+                      setState(() {
+                        rolValue = newRol!;
+                      });
+                    },
+                    items: roles.map((rol) {
+                      return DropdownMenuItem<String>(
+                        value: rol,
+                        child: Text(
+                          rol,
+                          style: 
+                            const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 19
+                            )
+                          ),
+                      );
+                    }).toList(),
+                  ),
                 ),
               ],
             ),
@@ -224,6 +228,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
       margin: const EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0),
       child: Column(
         children: [
+          const SizedBox(height: 3),
           ListTile(
             title: RichText(
               text: TextSpan(
@@ -280,24 +285,26 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                           TextStyle(fontWeight: FontWeight.bold, 
                           fontSize: 18),
                     ),
-                    DropdownButton<String>(
-                      value: empleado['estado_cuenta'],
-                      dropdownColor: EsquemaDeColores.secondary,
-                      onChanged: (newValue) {
-                        setState(() {
-                          empleado['estado_cuenta'] = newValue!;
-                        });
-                      },
-                      items: estados.map((estado) {
-                        return DropdownMenuItem<String>(
-                          value: estado,
-                          child: Text(estado,
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 18)),
-                        );
-                      }).toList(),
+                    DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: empleado['estado_cuenta'],
+                        dropdownColor: EsquemaDeColores.secondary,
+                        onChanged: (newValue) {
+                          setState(() {
+                            empleado['estado_cuenta'] = newValue!;
+                          });
+                        },
+                        items: estados.map((estado) {
+                          return DropdownMenuItem<String>(
+                            value: estado,
+                            child: Text(estado,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 18)),
+                          );
+                        }).toList(),
+                      ),
                     ),
                     const Text(
                       'Rol:',
@@ -307,67 +314,74 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                             fontSize: 18
                           ),
                     ),
-                    DropdownButton<String>(
-                      value: empleado['rol'],
-                      dropdownColor: EsquemaDeColores.secondary,
-                      onChanged: (newValue) {
-                        setState(() {
-                          empleado['rol'] = newValue!;
-                        });
+                    DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: empleado['rol'],
+                        dropdownColor: EsquemaDeColores.secondary,
+                        onChanged: (newValue) {
+                          setState(() {
+                            empleado['rol'] = newValue!;
+                          });
+                        },
+                        items: roles.map((rol) {
+                          return DropdownMenuItem<String>(
+                            value: rol,
+                            child: Text(rol,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 18
+                                    )
+                                  ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FFButtonWidget(
+                      onPressed: () async {
+                        try {
+                          await supabase.from('empleado').update({
+                            'estado_cuenta': empleado['estado_cuenta'],
+                            'rol': empleado['rol']
+                          }).match(
+                              {'correo_electronico': empleado['correo_electronico']});
+                        } catch (e) {
+                          showCustomErrorDialog(context, e.toString());
+                          return;
+                        }
+                        showCustomExitDialog(context, 'Actualización exitosa');
+                        cargarEmpleados();
                       },
-                      items: roles.map((rol) {
-                        return DropdownMenuItem<String>(
-                          value: rol,
-                          child: Text(rol,
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 18
-                                  )
-                                ),
-                        );
-                      }).toList(),
+                      text: 'Actualizar Empleado',
+                      options: FFButtonOptions(
+                        width: 250,
+                        height: 32,
+                        padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                        iconPadding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                        color: const Color.fromARGB(255, 4, 88, 254),
+                        textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                              fontFamily: 'Plus Jakarta Sans',
+                              color: Colors.white,
+                              fontSize: 17,
+                              letterSpacing: 0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                        elevation: 3,
+                        borderSide: const BorderSide(
+                          color: Colors.transparent,
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(40),
+                      ),
                     ),
                   ],
                 ),
               ],
-            ),
-          ),
-          FFButtonWidget(
-            onPressed: () async {
-              try {
-                await supabase.from('empleado').update({
-                  'estado_cuenta': empleado['estado_cuenta'],
-                  'rol': empleado['rol']
-                }).match(
-                    {'correo_electronico': empleado['correo_electronico']});
-              } catch (e) {
-                showCustomErrorDialog(context, e.toString());
-                return;
-              }
-              showCustomExitDialog(context, 'Actualización exitosa');
-              cargarEmpleados();
-            },
-            text: 'Actualizar Empleado',
-            options: FFButtonOptions(
-              width: 250,
-              height: 32,
-              padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-              iconPadding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-              color: const Color.fromARGB(255, 4, 88, 254),
-              textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                    fontFamily: 'Plus Jakarta Sans',
-                    color: Colors.white,
-                    fontSize: 17,
-                    letterSpacing: 0,
-                    fontWeight: FontWeight.w500,
-                  ),
-              elevation: 3,
-              borderSide: const BorderSide(
-                color: Colors.transparent,
-                width: 1,
-              ),
-              borderRadius: BorderRadius.circular(40),
             ),
           ),
           const SizedBox(height: 10.0),
