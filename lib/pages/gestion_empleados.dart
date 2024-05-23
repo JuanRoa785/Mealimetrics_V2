@@ -96,7 +96,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
               height: 10.0,
             ),
             Container(
-              margin: const EdgeInsets.only(left: 10, right: 15.0),
+              margin: const EdgeInsets.only(left: 3, right: 10.0),
               child: TextField(
                 controller: filterController,
                 keyboardType: TextInputType.text,
@@ -119,11 +119,11 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
               height: 5.0,
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 const Text(
                   textAlign: TextAlign.start,
-                  'Estado:',
+                  'Estado: ',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 19
@@ -153,7 +153,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                   ),
                 ),
                 const Text(
-                  'Rol:',
+                  'Rol: ',
                   style: TextStyle(
                     fontWeight: FontWeight.bold, 
                     fontSize: 19
@@ -230,6 +230,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
         children: [
           const SizedBox(height: 3),
           ListTile(
+            contentPadding: const EdgeInsets.only(left:9, right:9, top:2, bottom: 2),
             title: RichText(
               text: TextSpan(
                 text: 'Usuario: ',
@@ -280,7 +281,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Estado:',
+                      'Estado: ',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, 
                           fontSize: 18),
@@ -307,7 +308,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                       ),
                     ),
                     const Text(
-                      'Rol:',
+                      'Rol: ',
                       style:
                           TextStyle(
                             fontWeight: FontWeight.bold, 
