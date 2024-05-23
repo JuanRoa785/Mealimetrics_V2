@@ -6,7 +6,6 @@ import 'package:mealimetrics/Styles/color_scheme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mealimetrics/Pedidos/seleccionar_pedido.dart';
 import 'package:mealimetrics/Pedidos/pedidos_main.dart';
-import 'package:mealimetrics/Pedidos/seleccionar_platillo.dart';
 import 'package:flutter/services.dart';
 
 const supabaseUrl = 'https://ddyveuettsjaxmdbijgb.supabase.co';
@@ -62,7 +61,7 @@ class MyApp extends StatelessWidget {
         '/actualizarDatos': (_) => const ActualizarDatos(),
         '/PedidosMain': (context) => const PedidosMain(),
         '/SeleccionarPedido': (context) => const SeleccionarPedido(),
-        '/SeleccionarPlatillo': (context) => const SeleccionarPlatillo(),
+        //'/SeleccionarPlatillo': (context) => const SeleccionarPlatillo(),
       },
     );
   }

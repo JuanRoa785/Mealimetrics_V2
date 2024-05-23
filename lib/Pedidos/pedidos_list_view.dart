@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +8,7 @@ import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'estados\\modelo_lista_pedidos.dart';
 import '..\\Styles\\color_scheme.dart';
+import 'dart:async';
 
 
 class PedidosListView extends ConsumerStatefulWidget{
@@ -16,169 +19,407 @@ class PedidosListView extends ConsumerStatefulWidget{
 }
 
 class _PedidosListView extends ConsumerState<PedidosListView>{
-
   String _idMesero = '';
   final List<DropdownMenuItem<String>> _listaDeEstadosDePedido = buildListaDeEstados();
+  final List<String> _listaDeMesas = ['Todas', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+  String? _mesaSeleccionada;
+  List<Map<String, dynamic>> noEmplatados = [];
+  List<Map<String, dynamic>> emplatados = [];
+  Timer? _timer;
 
   @override
   void initState(){
     super.initState();
 
     obtenerIdMesero();
-
-    obtenerPedidosIniciales();
-
+    obtenerPedidos();
+ 
+    _startPeriodicTask();
+    _mesaSeleccionada = _listaDeMesas[0];
+    //obtenerPedidosIniciales();
   }
 
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancelar el temporizador cuando se deshaga el widget
+    super.dispose();
+  }
+
+  //Emulamos un funcionamiento en tiempo real 
+  void _startPeriodicTask() {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      obtenerPedidosPeriodicamente();
+    });
+  }
 
   @override
   Widget build( BuildContext context ){
     return Scaffold(
       body: ListView(
-
         padding: const EdgeInsets.symmetric(
           horizontal: 15.0,
           vertical: 23.0,
         ),
-
-        children: ref.watch(riverpodListaPedidos).listaPedidos.map( (pedido) => pedidoCard(pedido) ).toList(),
-        
-
-                 
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                 const Text(
+                  "Seleccionar Mesa: ",
+                  style: TextStyle(
+                    color: EsquemaDeColores.primary,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold
+                    ),
+                    textAlign: TextAlign.center,
+                ),
+                
+                Center(
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton2<String>(
+                      items: _listaDeMesas
+                          .map((mesa) => DropdownMenuItem<String>(
+                                value: mesa,
+                                child: Text(mesa),
+                              ))
+                          .toList(),
+                      style: const TextStyle(
+                        color: EsquemaDeColores.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                      ),
+                      alignment: Alignment.center,
+                      value: _mesaSeleccionada,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _mesaSeleccionada = value;
+                          obtenerPedidos();
+                        });
+                      },
+                      buttonStyleData: const ButtonStyleData(
+                        height: 40,
+                      ),
+                      iconStyleData: const IconStyleData(
+                        iconSize: 20,
+                        iconEnabledColor: EsquemaDeColores.primary,
+                      ),
+                      dropdownStyleData: DropdownStyleData(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            //...emplatados.map((pedido) => pedidoCard(pedido)),
+            //...noEmplatados.map((pedido) => pedidoCard(pedido)),
+            ..._cargarPedidos('emplatado'),
+            ..._cargarPedidos('noEmplatado'),
+        ],        
       ),
     );
   }
 
+  List<Widget> _cargarPedidos(String tipo) {
+    List<Map<String, dynamic>> pedidos;
+    if(tipo == 'emplatado'){
+      pedidos = emplatados;
+    }
+    else{
+      pedidos = noEmplatados;
+    }
 
+    if (_mesaSeleccionada == 'Todas') {
+      return pedidos.map((pedido) => pedidoCard(pedido)).toList();
+    } else {
+      List<Map<String, dynamic>> pedidosFiltrados = pedidos.where((pedido) => '${pedido['id_mesa']}' == _mesaSeleccionada.toString()).toList();
+      //print('${pedidos[0]['id_mesa']} $_mesaSeleccionada');
+      return pedidosFiltrados.map((pedido) => pedidoCard(pedido)).toList();
+    }
+  }
 
   //método para crear las card
   Widget pedidoCard( Map<String, dynamic> pedido ){
+    String aux = '${pedido["paraLlevar"]}';
+    String paraLlevar = '${aux[0].toUpperCase()}${aux.substring(1)}';
+    Color cardColor = pedido['estado'] == 'Emplatado' ? const Color.fromARGB(255, 255, 176, 29) : EsquemaDeColores.secondary;
     return Card(
-
       elevation: 20,
       margin: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
-      color: EsquemaDeColores.secondary,
+      color: cardColor,
 
       shape: OutlineInputBorder(
         borderRadius:  BorderRadius.circular(13.0),
         borderSide: BorderSide.none,
       ),
 
-
       child:Padding(
         
-        padding: const EdgeInsets.all(12.0),
-
+      padding: const EdgeInsets.all(12.0),
 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(
-              'Cliente: ${pedido["cliente"]}',
-              style: const TextStyle(
-                color: EsquemaDeColores.onPrimary,
+            RichText(
+              text: TextSpan(
+                children: [
+                  const TextSpan(
+                    text: 'Cliente: ',
+                    style: TextStyle(
+                      color: EsquemaDeColores.onPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const TextSpan(text:" "),
+                  TextSpan(
+                    text: pedido["cliente"],
+                    style: const TextStyle(
+                      color: EsquemaDeColores.primary,
+                      fontSize: 17,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(
-              height: 5.0,
+              height: 7.0,
             ),
-            Text(
-              'Mesero: ${pedido["mesero"]}',
-              style: const TextStyle(
-                color: EsquemaDeColores.onPrimary,
+            RichText(
+              text: TextSpan(
+                children: [
+                  const TextSpan(
+                    text: 'Mesero: ',
+                    style: TextStyle(
+                      color: EsquemaDeColores.onPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const TextSpan(text:" "),
+                  TextSpan(
+                    text: pedido["mesero"],
+                    style: const TextStyle(
+                      color: EsquemaDeColores.primary,
+                      fontSize: 17,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(
-              height: 5.0,
+              height: 7.0,
             ),
-            Text(
-              'Mesa: ${pedido["id_mesa"]}',
-              style: const TextStyle(
-                color: EsquemaDeColores.onPrimary,
-              ),
-            ),
-            const SizedBox(
-              height: 5.0,
-            ),
-            Text(
-              'Para Llevar: ${pedido["paraLlevar"]}',
-              style: const TextStyle(
-                color: EsquemaDeColores.onPrimary,
-              ),
-            ),
-            const SizedBox(
-              height: 5.0,
-            ),
+            Row(
+              children:[
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Mesa: ',
+                        style: TextStyle(
+                          color: EsquemaDeColores.onPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const TextSpan(text:" "),
+                      TextSpan(
+                        text: '${pedido["id_mesa"]}',
+                        style: const TextStyle(
+                          color: EsquemaDeColores.primary,
+                          fontSize: 17,
+                          //fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  width: 12.0,
+                ),
+                const Text(
+                  " - ", 
+                  style: TextStyle(
+                    color: EsquemaDeColores.onPrimary,
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 16),
+                ),
+                const SizedBox(
+                  width: 12.0,
+                ),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Para Llevar: ',
+                        style: TextStyle(
+                          color: EsquemaDeColores.onPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const TextSpan(text:" "),
+                      TextSpan(
+                        text: paraLlevar,
+                        style: const TextStyle(
+                          color: EsquemaDeColores.primary,
+                          fontSize: 17,
+                          //fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ]),
             Row(
               children: <Widget>[
                 const Text(
                   'Estado:',
                   style: TextStyle(
-                    color: EsquemaDeColores.primary,
+                    color: EsquemaDeColores.onPrimary,
                     fontWeight: FontWeight.bold,
+                    fontSize: 16
                   ),
                 ),
-                const SizedBox(
-                  width: 5,
-                ),
-                DropdownButton2<String>(
-                  items: _listaDeEstadosDePedido,
-                  style: const TextStyle(
-                    color: EsquemaDeColores.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                  value: pedido['estado'],
-                  onChanged: (String? value) async {
-                    final supabase =  Supabase.instance.client;
+                DropdownButtonHideUnderline(
+                  child: DropdownButton2<String>(
+                    items: _listaDeEstadosDePedido,
+                    style: const TextStyle(
+                      color: EsquemaDeColores.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17, 
+                    ),
+                    alignment: Alignment.center,
+                    value: pedido['estado'],
+                    onChanged: (String? value) async {
+                      final supabase =  Supabase.instance.client;
 
-                    try{
-                      await supabase
-                      .from('Pedido')
-                      .update({ 'estado': value })
-                      .match({'id': pedido['id']});
-                    }
-                    catch (e){
-                      showCustomErrorDialog(
-                        context, 
-                        e.toString()
-                      );
-                      return;
-                    }
-
-                    setState(() {
-
-                      ref.watch(riverpodListaPedidos).cambiarEstadoPorId(pedido['id'], value!);
-                      
-                      if( value == 'Pagado'){
-                        ref.watch(riverpodListaPedidos).elimiarPedidoPorId(pedido['id']);
+                      try{
+                        await supabase
+                        .from('Pedido')
+                        .update({ 'estado': value })
+                        .match({'id': pedido['id']});
+                      }
+                      catch (e){
+                        showCustomErrorDialog(
+                          context, 
+                          e.toString()
+                        );
+                        return;
                       }
 
-                    });
-                  },
-                  
-                ),
+                      if (value == 'Servido') {
+                        try{
+                          await supabase
+                          .from('Pedido')
+                          .update({ 'tiempoPreparacion': calcularDiferenciaPedido(pedido) })
+                          .match({'id': pedido['id']});
+                        }
+                        catch (e){
+                          showCustomErrorDialog(
+                            context, 
+                            e.toString()
+                          );
+                          return;
+                        }
+                      }
+
+                      if (value == 'Pagado') {
+                        String fechaActual = '${DateTime.now()}';
+                        List partesFecha = fechaActual.split(".");
+                        try {
+                          await supabase.from('Pedido').
+                          update({
+                            'fecha_pagado': '${partesFecha[0]}'
+                          })
+                          .match({'id': pedido['id']});
+                        } catch (e) {
+                          showCustomErrorDialog(context, e.toString());
+                          return;
+                        }
+                      }
+
+                      setState(() {
+                        obtenerPedidos();
+                        /*ref.watch(riverpodListaPedidos).cambiarEstadoPorId(pedido['id'], value!);
+                        if( value == 'Pagado'){
+                          ref.watch(riverpodListaPedidos).elimiarPedidoPorId(pedido['id']);
+                        }*/
+                      });
+                    },
+                    buttonStyleData: const ButtonStyleData(
+                      height: 40,
+                    ),
+                    iconStyleData: const IconStyleData(
+                      iconSize: 20,
+                      iconEnabledColor: EsquemaDeColores.onPrimary,
+                    ),
+                    dropdownStyleData:DropdownStyleData(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    )
+                  ),
+                )
               ]
             ),
-            const SizedBox(
-              height: 5.0,
+            const Text(
+              'Almuerzos:',
+              style: TextStyle(
+                color: EsquemaDeColores.primary,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
-              'Platillos: ${pedido['platillosListaString']}',
+              '${pedido["string_pedido"].replaceAll('/n', '\n')}',
               style: const TextStyle(
                 color: EsquemaDeColores.onPrimary,
-              ),
+                fontSize: 16, 
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold),
+              textAlign: TextAlign.justify,
             ),
             const SizedBox(
-              height: 5.0,
+              height: 7.0,
             ),
-            Text(
-              'Precio Total: \$${NumberFormat.decimalPattern("es_CO").format( pedido['precioTotal'] )} COP ',
-              style: const TextStyle(
-                color: EsquemaDeColores.primary,
-                fontWeight: FontWeight.bold,
-                fontSize: 15
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Precio Total: ',
+                        style: TextStyle(
+                          color: EsquemaDeColores.onPrimary,
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const TextSpan(text:" "),
+                      TextSpan(
+                        text: '\$${NumberFormat.decimalPattern("es_CO").format( pedido['precioTotal'] )} COP' ,
+                        style: const TextStyle(
+                          color: EsquemaDeColores.primary,
+                          fontSize: 18,
+                          //fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -186,8 +427,96 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
     );
   }
 
-  Future<void> obtenerPedidosIniciales() async {
+  String calcularDiferenciaPedido( Map<String, dynamic> pedido ){
+    DateTime fechaActual = DateTime.now();
+    String fechaCreacionStr = pedido['created_at'];
+    DateTime fechaCreacion = DateTime.parse(fechaCreacionStr);
+    
+    // Extraer horas, minutos y segundos de las fechas
+    int horaActual = fechaActual.hour;
+    int minutoActual = fechaActual.minute;
+    int segundoActual = fechaActual.second;
+    int horaCreacion = fechaCreacion.hour;
+    int minutoCreacion = fechaCreacion.minute;
+    int segundoCreacion = fechaCreacion.second;
+    
+    // Calcular la diferencia de tiempo en horas, minutos y segundos
+    int diferenciaHoras = horaActual - horaCreacion;
+    int diferenciaMinutos = minutoActual - minutoCreacion;
+    int diferenciaSegundos = segundoActual - segundoCreacion;
+    
+    // Ajustar la diferencia si los segundos son negativos
+    if (diferenciaSegundos < 0) {
+      diferenciaMinutos--;
+      diferenciaSegundos += 60;
+    }
+    // Ajustar la diferencia si los minutos son negativos
+    if (diferenciaMinutos < 0) {
+      diferenciaHoras--;
+      diferenciaMinutos += 60;
+    }
+    
+    //print('Diferencia: $diferenciaHoras horas, $diferenciaMinutos minutos, $diferenciaSegundos segundos');
+    //print('$diferenciaHoras:$diferenciaMinutos:$diferenciaSegundos');
+    return '$diferenciaHoras:$diferenciaMinutos:$diferenciaSegundos';
+  }
 
+  Future<void> obtenerPedidos() async {
+    WidgetsBinding.instance.addPostFrameCallback( (_) => showCircularProgressIndicator() );
+    final supabase = Supabase.instance.client;
+
+    final pedidosNoEmplatados = await supabase
+      .from('Pedido')
+      .select()
+      .eq('id_mesero', _idMesero)
+      .neq('estado', 'Emplatado')
+      .neq('estado', 'Pagado')
+      .order('created_at', ascending: true);
+
+    final pedidosEmplatados = await supabase
+      .from('Pedido')
+      .select()
+      .eq('id_mesero', _idMesero)
+      .eq('estado', 'Emplatado')
+      .order('created_at', ascending: true);
+
+    setState(() {
+      noEmplatados = pedidosNoEmplatados;
+      emplatados = pedidosEmplatados;
+    });
+  
+    //print(pedidosNoEmplatados.length);
+    //print(pedidosEmplatados.length);
+    Navigator.pop( context );
+  }
+
+  void obtenerPedidosPeriodicamente() async {
+    final supabase = Supabase.instance.client;
+    
+    final pedidosNoEmplatados = await supabase
+      .from('Pedido')
+      .select()
+      .eq('id_mesero', _idMesero)
+      .neq('estado', 'Emplatado')
+      .neq('estado', 'Pagado')
+      .order('created_at', ascending: true);
+
+    final pedidosEmplatados = await supabase
+      .from('Pedido')
+      .select()
+      .eq('id_mesero', _idMesero)
+      .eq('estado', 'Emplatado')
+      .order('created_at', ascending: true);
+
+    if(pedidosEmplatados.length != emplatados.length || pedidosNoEmplatados.length != noEmplatados.length){
+      setState(() {
+        noEmplatados = pedidosNoEmplatados;
+        emplatados = pedidosEmplatados;
+      });
+    }
+  }
+
+  Future<void> obtenerPedidosIniciales() async {
     /// Primero, antes que nada, se añade una función para
     /// mostrar una barra circular de carga antes de mostrar 
     /// los pedidos en su respectiva lista de cards. Se usa
@@ -214,7 +543,6 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
       .eq('id_mesero', _idMesero)
       .neq('estado', 'Pagado');
 
-
     /// Ahora, vamos a recorrer todos estos pedidos 
     /// para sacar información de ellos
     for( var i = 0; i < listaDePedidosDeActualMesero.length; i++ ) {
@@ -223,7 +551,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
       /// para el siguiente pedido
       aux = '';
 
-      print("\n\n++++++++++++++++++++++++++++ listaDePedidosActualMesero en indice $i tiene un estado igual a: ${listaDePedidosDeActualMesero[i]['estado']}  ++++++++++++++++++++++++++++\n\n");
+      //print("\n\n++++++++++++++++++++++++++++ listaDePedidosActualMesero en indice $i tiene un estado igual a: ${listaDePedidosDeActualMesero[i]['estado']}  ++++++++++++++++++++++++++++\n\n");
 
       /// Para cada pedido, encontramos los platillos
       /// que se pidieron para ese pedido. Para esto
@@ -249,7 +577,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
         .eq('id_pedido', listaDePedidosDeActualMesero[i]['id']);
 
 
-        print("\t\n\n------------------- Platillos para este pedido: $platillosDeCadaPedido ------------------- \n\n");
+        //print("\t\n\n------------------- Platillos para este pedido: $platillosDeCadaPedido ------------------- \n\n");
 
 
         /// Para cada uno de esos platillos se encuentra el nombre
@@ -269,8 +597,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
           /// Ejemplo: HamburguesaClasica (X3), Jugo de Mora (X8),
           aux = '$aux${nombreDeCadaPlatillo[0]['nombre']} (X${platillosDeCadaPedido[j]['cantidad']}), ';
 
-          print("\n~~~~~~~~~~ Nombre #${j}: ${nombreDeCadaPlatillo[0]['nombre']} con cantidad ${platillosDeCadaPedido[j]['cantidad']} ~~~~~~~~~~\n");
-
+          //print("\n~~~~~~~~~~ Nombre #${j}: ${nombreDeCadaPlatillo[0]['nombre']} con cantidad ${platillosDeCadaPedido[j]['cantidad']} ~~~~~~~~~~\n");
         }
 
         aux = aux.substring(0, aux.length - 2);
@@ -279,14 +606,10 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
         /// de pedidos (estos pedidos son diccionarios).
         listaDePedidosDeActualMesero[i]['platillosListaString'] = aux;
 
-        print('\n\Final text for pedido: $aux\n');
-
-      
+        //print('\n\Final text for pedido: $aux\n');
     }
 
-
     setState(() {
-
       /// Finalmente, con la clave "platillosListaString"
       /// ya asignada al diccionario que contiene la información
       /// sobre cada pedido, se hace la asignación al riverpodListaPedidos
@@ -297,15 +620,10 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
       /// es decir, de la barra circular de carga en la que
       /// nos encontrabamos anteriormente
       Navigator.pop( context );
-      
     });
-   
   }
 
-
-
   Future<void> obtenerIdMesero() async {
-
     final supabase = Supabase.instance.client;
 
     final User user = supabase.auth.currentUser!;
@@ -313,16 +631,13 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
     setState(() {
       _idMesero = user.id;
     });
-
   }
 
 
   void showCircularProgressIndicator() {
-
     showDialog(
       context: context, 
       builder: ((context) {
-        
         /// Ponerle el absorbponiter permite
         /// que los taps que hayan encima de la
         /// pantalla serán absorbidos por el 
@@ -335,21 +650,16 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
             child: CircularProgressIndicator(),
           )
         );
-
       })
     );
   }
-  
 }
 
-
-
 /// ====================================================================================
 /// ====================================================================================
-
 
 List<DropdownMenuItem<String>> buildListaDeEstados(){
-    List<String> listaDeEstados = ['Ordenado', 'Preparándose', 'Servido', 'Pagado'];
+    List<String> listaDeEstados = ['Ordenado', 'Emplatado', 'Servido', 'Pagado'];
     List<DropdownMenuItem<String>> retorno = [];
 
     for( var i = 0; i < listaDeEstados.length; i++ ){
@@ -360,13 +670,6 @@ List<DropdownMenuItem<String>> buildListaDeEstados(){
           child: Text(listaDeEstados[i]),
         )
       );
-
     }
-
     return retorno;
-    
   }
-
-
-
-

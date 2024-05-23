@@ -16,3 +16,9 @@ final riverpodPlatillosHashSet = StateProvider< HashSet<Map<String, dynamic>> >(
     return hashSetPlatillos;
   }
 );
+
+final almuerzosStringProvider = StateProvider<String>(
+  (ref) {
+    return '';
+  }
+);

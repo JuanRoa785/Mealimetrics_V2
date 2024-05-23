@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,7 +65,7 @@ class _SeleccionarCantidadPlatillosState extends ConsumerState<SeleccionarCantid
           onChanged: (numeroDePlatillos){
             _cantidadDePlatillos = int.parse( numeroDePlatillos );
             
-            print("La cantidad de platillos que desea es: $_cantidadDePlatillos");
+            //print("La cantidad de platillos que desea es: $_cantidadDePlatillos");
           },
         ),
 
@@ -95,8 +97,7 @@ class _SeleccionarCantidadPlatillosState extends ConsumerState<SeleccionarCantid
               return;
             }
             catch (e){
-              print("Ha sucedido el erron ${e.toString()}");
-
+              //print("Ha sucedido el erron ${e.toString()}");
             }
             
             ref.read(riverpodCuantosPlatillosQuiere.notifier).state = _cantidadDePlatillos;

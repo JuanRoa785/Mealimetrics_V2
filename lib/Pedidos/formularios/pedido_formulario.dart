@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, avoid_function_literals_in_foreach_calls
+
 import 'dart:collection';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -5,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mealimetrics/Pedidos/Excepciones/pedido_formulario.dart';
 import 'package:mealimetrics/Pedidos/estados/cuantos_platillos_quiere.dart';
 import 'package:mealimetrics/Pedidos/estados/modelo_lista_pedidos.dart';
+import 'package:mealimetrics/Pedidos/seleccionar_platillo.dart';
+import 'package:mealimetrics/pages/home_mesero.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '..\\..\\Styles\\color_scheme.dart';
@@ -22,6 +26,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
   String _cliente = '';
   String _mesero = '';
+  int _cantidad = 0;
   int? _mesa;
   List<DropdownMenuItem<int>> _tableDropDownMenuItems = [];
   bool? _paraLlevar;
@@ -32,6 +37,11 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
     initialiceTableDropDownItems();
 
     obtenerNombreMesero();
+
+    //Reiniciamos el String
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(almuerzosStringProvider.notifier).state = '';
+    });
 
     super.initState();
 
@@ -98,7 +108,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
                 onChanged: (cliente){
                   _cliente = cliente;
-                  print("El nombre del cliente es: $_cliente");
+                  //print("El nombre del cliente es: $_cliente");
                 },
               ),
 
@@ -149,7 +159,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
                 onChanged: (mesa){
                   _mesa = mesa;
-                  print('La mesa es: $_mesa');
+                  //print('La mesa es: $_mesa');
                 },
               ),
               
@@ -174,11 +184,40 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
                 onChanged: (paraLlevar){
                   _paraLlevar = paraLlevar;
-                  print('El pedido es para llevar?: $_paraLlevar');
+                  //print('El pedido es para llevar?: $_paraLlevar');
                 },
 
               ),
               
+              const SizedBox(
+                height: 15.0,
+              ),
+
+              TextField(
+                enableInteractiveSelection: false,
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
+                                
+                decoration: InputDecoration(
+                  hintText: '# de Almuerzos',
+                  labelText: 'Cantidad de Almuerzos',
+                  suffixIcon: const Icon( 
+                    Icons.numbers,
+                    color: EsquemaDeColores.secondary,
+                    ),
+                  border: OutlineInputBorder(
+                    borderRadius:  BorderRadius.circular(13.0),
+                  ),
+                ),
+                keyboardType: TextInputType.number,
+                onChanged: (cantidad){
+                  if(cantidad == "" || cantidad.contains('-')){
+                    cantidad = '0';
+                  }
+                  _cantidad = int.parse(cantidad);
+                },
+              ),
+
               const SizedBox(
                 height: 15.0,
               ),
@@ -195,8 +234,15 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                       ),
 
                       onPressed: () {
-                        // Button onPressed action
-                        Navigator.pushNamed(context, '/SeleccionarPlatillo');
+                        if(_cantidad == 0){
+                          showCustomErrorDialog(context, '¡Digite una cantidad de Almuerzos valida!');
+                          return;
+                        }
+                        Navigator.push(context,
+                           MaterialPageRoute(
+                            builder: (context) => SeleccionarPlatillo(cantidad: _cantidad), 
+                          ),
+                        );
                       },
                       child: const Text(
                         'Seleccionar Platillo',
@@ -233,14 +279,25 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
               ),
 
               const SizedBox(
-                height: 15.0,
+                height: 10.0,
               ),
 
-              Visibility(
+              /*Visibility(
                 visible: ref.watch(riverpodPlatillosHashSet).isNotEmpty,                
                 child: Text(
                   toStringPlatillos(ref.watch(riverpodPlatillosHashSet)),
                 ),
+              ),*/
+
+              const SizedBox(
+                height: 15.0,
+              ),
+
+              Visibility(
+                visible: ref.watch(almuerzosStringProvider)!='',                
+                child: Text(
+                  ref.watch(almuerzosStringProvider).toString(),
+                  style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.justify,),
               ),
 
               const SizedBox(
@@ -248,9 +305,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
               ),
 
               TextButton(
-                
                 onPressed: () async {
-                  
                   try{
                     verifyFormVariables();
                   }
@@ -262,7 +317,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                     return;
                   }
                   catch (e) {
-                    print("hubo una excepcion: ${e.toString()}");
+                    //print("hubo una excepcion: ${e.toString()}");
                     return;
                   }
 
@@ -283,10 +338,15 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   /// Creo el diccionario que va a servir
                   /// para subir los datos a la base de datos
                   /// y, tambien, para añadirlo al riverpodListaPedidos
+                  String date = '${DateTime.now()}';
+                  List partesDate = date.split("."); //Eliminamos los milisegundos
+                  //print(partesDate[0]);
+                  
                   Map<String, dynamic> diccionarioPedido = {
                     'cliente': _cliente,
-                    'fecha_pagado':  ( DateTime.timestamp().toIso8601String() ),
-                    'tiempoPreparacion': '15 min',
+                    'created_at': partesDate[0],
+                    'fecha_pagado':  partesDate[0],
+                    'tiempoPreparacion': 'N.A',
                     'mesero': _mesero,
                     'id_mesa': _mesa,
                     'paraLlevar': _paraLlevar,
@@ -294,19 +354,14 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                     'precioTotal': calcularPrecioTotalPedido( ref.watch(riverpodPlatillosHashSet) ),
                     'id_mesero': supabase.auth.currentUser!.id,
                     'estado': 'Ordenado',
+                    'string_pedido': ref.watch(almuerzosStringProvider).replaceAll('\n', '/n'),
                   };
-
-
-
 
                   /// Subo el diccionario anteriormente creado
                   /// a la base de datos
                   await supabase
                     .from('Pedido')
                     .insert( diccionarioPedido );
-
-                  
-
 
                   /// Consigo el todas las columnas del pedido
                   /// recientemente subido a la base de datos
@@ -320,8 +375,6 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   /// se hayan ordenado, usando el id del pedido
                   relacionarPedidoPlatillo( dataPedido[0]['id'] , ref.watch(riverpodPlatillosHashSet)  );
 
-
-
                   /// Ahora, ese diccionario que creamos hace un
                   /// momento, se va a reemplazar por lo que sea
                   /// que hayamos guardado en la base de datos. Esto
@@ -329,7 +382,6 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   /// asigna la base de datos automaticamente
                   diccionarioPedido = dataPedido[0];
 
-                
                   /// Ahora, ese diccionario que creamos hace un 
                   /// instante, lo vamos a meter en el riverpodListPedidos
                   /// PERO, antes se debe añadir una cosita que nos permite
@@ -338,34 +390,30 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   /// la key 
                   diccionarioPedido['platillosListaString'] = toStringPlatillos( ref.watch(riverpodPlatillosHashSet) );
 
-
-
                   /// Ahora, sí vamos a insertar ese diccionario
                   /// dentro del riverpod
                   ref.read(riverpodListaPedidos).addDictionary( diccionarioPedido );
 
-
-
-                  /// Imprimimos la variable para ver si todo bien
-                 for( var i = 0; i < ref.watch(riverpodListaPedidos).listaPedidos.length; i++ )
+                 /// Imprimimos la variable para ver si todo bien
+                 /*for( var i = 0; i < ref.watch(riverpodListaPedidos).listaPedidos.length; i++ )
                   {
                     print("\n\n================= riverpodListPedidos en indice $i es: ${ref.watch(riverpodListaPedidos).listaPedidos[i]} ================= \n\n");
-                  }
-
+                  }*/
 
                   ref.read(riverpodPlatillosHashSet.notifier).state = HashSet();
-                  
-                 
-                  Navigator.pop(context);
+
+                  //Se hace con esto para hacer la consulta con el nuevo pedido directamente + activar las consultasPeriodicas         
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeMesero()),
+                  );
                 },
-                
-                
+                          
                 style: const ButtonStyle(
                   backgroundColor: MaterialStatePropertyAll(EsquemaDeColores.secondary),
                   padding: MaterialStatePropertyAll( EdgeInsets.all(15) ),
                 ),
                 
-
                 child: const Text(
                   'Crear Pedido',
                   style: TextStyle(
@@ -375,27 +423,22 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                   ),
                 ),
               ),
-              
             ],
           ),
         ],
       ),
     );
-    
   }
 
 
   Future<void> initialiceTableDropDownItems() async {
-
     /// Primero, nos conectamos con la base de datos
     final supabase = Supabase.instance.client;
-
 
     /// Luego, creamos una lista que va a almacenar
     /// los dropdowmMenuItems que se crearan con el 
     /// id de las mesas que NO se encuentren ocupadas.
     final List<DropdownMenuItem<int>> mesaItems = [];
-
 
     /// Para obtener, unicamente, las mesas que no 
     /// se encuentren ocupadas, se hace una consulta
@@ -408,15 +451,11 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
       .select('id')
       .eq('esta_ocupada', false);
 
-
-
     /// Tras esto, creamos una lista simple
     /// que se va a usar unicamente para
     /// ordenar los id de las mesas que no
     /// esten ocupadas de manera ascendente
     List listaDeIdDeMesa = [];
-
-
 
     /// Asignamos cada uno de los id a
     /// una posicion en la lista anteriormente
@@ -426,16 +465,12 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
       listaDeIdDeMesa.add( mesaData[i]['id'] );
     }
 
-
-
-
     /// Luego, hacemos sort a la lista
     listaDeIdDeMesa.sort();
 
     for( var i = 0; i < listaDeIdDeMesa.length; i++ )
     {
-      
-      print('\n++++++++++++++++++++++++mesaData[$i][id] = ${mesaData[i]['id']}++++++++++++++++++++++++\n');
+      //print('\n++++++++++++++++++++++++mesaData[$i][id] = ${mesaData[i]['id']}++++++++++++++++++++++++\n');
       
       /// Finalmente, añadimos secuencialmente o 
       /// consecutivamente a la lista de  dropdownmenuitem
@@ -451,7 +486,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
       );
     }
 
-    print('mesaItems es: $mesaItems');
+    //print('mesaItems es: $mesaItems');
 
     setState(() {
       _tableDropDownMenuItems = mesaItems;
@@ -459,15 +494,13 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
 
   } 
 
-    /// Debido a que este script solo debería ser alcanzable
+  /// Debido a que este script solo debería ser alcanzable
   /// por una cuenta que sea de tipo "mesero", en esta varible
   /// se almacena el nombre del mesero que esté usando la cuenta.
   /// Revisar función obtenerNombreMesero()
   String nombreMesero = '';
 
-  
   Future<void> obtenerNombreMesero() async {
-    
     /// Primero, inicializo una conexión con la base de datos
     final supabase = Supabase.instance.client;
     
@@ -476,7 +509,6 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
     /// Es decir, si hay algun empleado usando la 
     /// aplicación en este momento
     final User user = supabase.auth.currentUser!;
-
 
     /// ese usuario tiene un ID asociado. uso ese
     /// id para buscar en la tabla "empleado" al
@@ -488,7 +520,6 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
       .select('id_persona')
       .eq('id_user', user.id);
 
-
     /// Con este ID_persona adquirido, hago una
     /// consulta en la base de datos en la tabla
     /// "persona" para averiguar cual es el nombre
@@ -499,8 +530,6 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
       .select('nombre_completo')
       .eq('id', idPersonaDeEmpleado[0]['id_persona']);
 
-
-
     setState(() {
       /// Ahora, este nombre es asignado a la variable
       /// "nombreMesero" que le pertenece a este script.
@@ -510,14 +539,11 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
     });
     /// Finalmente, lo muestro con un print...
     /// porque sí. es facil de debugear
-    print("\n\n======================= El mesero es: ${_mesero} =======================\n\n");
-
-    
+    //print("\n\n======================= El mesero es: ${_mesero} =======================\n\n");
 
   }
 
   verifyFormVariables(){
-
     bool aValueIsMissing = false;
     String mensaje = '';
 
@@ -550,11 +576,8 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
       mensaje = mensaje.substring(0, mensaje.length - 1);
       throw  AValueIsMissingException(mensaje);
     }
-
   }
-
 }
-
 
 List<DropdownMenuItem<bool>> buildListaParaLlevar() {
   return const [
@@ -586,19 +609,15 @@ String toStringPlatillos(HashSet<Map<String,dynamic>> hashSetDePlatillos ){
 }
 
 int calcularPrecioTotalPedido(HashSet<Map<String,dynamic>> hashSetDePlatillos ){
-  
   int precioTotal = 0;
 
   for( var element in hashSetDePlatillos ){
-
     precioTotal = precioTotal + toInt(  element['precio_unitario'] * element['cantidad'] )!;
-
   }
 
-  print("\n\n===============================El precio total de los platillos es: ${precioTotal}===============================\n\n");
+  //print("\n\n===============================El precio total de los platillos es: ${precioTotal}===============================\n\n");
 
   return precioTotal;
-
 }
 
 String createRandomString(int length) {
@@ -622,6 +641,4 @@ Future<void> relacionarPedidoPlatillo( int idPedido, HashSet<Map<String, dynamic
       ;
     }
   );
-
-  
 }
