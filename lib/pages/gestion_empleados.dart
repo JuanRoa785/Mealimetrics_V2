@@ -13,8 +13,7 @@ class GestionEmpleados extends StatefulWidget {
 }
 
 class _GestionEmpleadosState extends State<GestionEmpleados> {
-  List<Map<String, dynamic>> empleados =
-      []; // Lista de empleados obtenida de la DB
+  List<Map<String, dynamic>> empleados = []; // Lista de empleados obtenida de la DB
   List<String> estados = ['Activo', 'Inactivo'];
   List<String> roles = ['Gerente', 'Mesero', 'Chef'];
   String? rolValue;
