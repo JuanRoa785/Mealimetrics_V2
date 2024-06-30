@@ -90,7 +90,7 @@ class _GestionMenuState extends State<GestionMenu> with SingleTickerProviderStat
                   Tab(icon: Icon(Icons.rice_bowl)),
                   Tab(icon: Icon(Icons.local_dining)),
                   Tab(icon: Icon(Icons.local_drink)),
-                  Tab(icon: Icon(Icons.star_border_purple500))
+                  Tab(icon: Icon(Icons.fastfood_sharp))
                 ],
               ),
             ),
@@ -447,7 +447,7 @@ class _GestionMenuState extends State<GestionMenu> with SingleTickerProviderStat
                       width:150,
                       height:150,
                       child:  image!=null 
-                      ? Image.file(File(image!.path))
+                      ? Image.file(File(image!.path), fit: BoxFit.cover)
                       : Container(
                         color: EsquemaDeColores.primary,
                         child: const Center(

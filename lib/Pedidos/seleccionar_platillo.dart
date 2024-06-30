@@ -23,6 +23,7 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
   List<Map<String, dynamic>> platillos = [];
   List<Map<String, dynamic>> principios = [];
   List<Map<String, dynamic>> complementos = [];
+  List<Map<String, dynamic>> especiales = [];
   List<Map<String, dynamic>> platillosFiltrados = [];
   final HashSet<Map<String, dynamic>> _platillosSeleccionados = HashSet();
   late TabController tabController;
@@ -34,11 +35,12 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
   void initState() {
     super.initState();
     cantidad = widget.cantidad;
-    tabController = TabController(vsync: this, length: 3);
+    tabController = TabController(vsync: this, length: 4);
     tabController.addListener(handleTabChange);
 
     for (int i = 0; i < cantidad!; i++) {
       almuerzos.add({
+        'Especial': null,
         'Seco': null,
         'Principio': null,
         'Bebida': null,
@@ -102,18 +104,25 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
                   .from('Platillo')
                   .select()
                   .or('categoria_alimenticia.eq.Principio, categoria_alimenticia.eq.Complemento')
-                  .order('nombre', ascending: true);
+                  .order('categoria_alimenticia', ascending: false);
 
       final dataComp = await supabase
                   .from('Platillo')
                   .select()
                   .or('categoria_alimenticia.eq.Bebida, categoria_alimenticia.eq.Sopa')
                   .order('categoria_alimenticia', ascending: true);
-    
+
+      final dataEsp = await supabase
+                  .from('Platillo')
+                  .select()
+                  .eq('categoria_alimenticia', 'Especial')
+                  .order('nombre', ascending: true);
+
       setState(() {
         platillos = dataPlatos;
         principios = dataPrinc;
         complementos = dataComp;
+        especiales = dataEsp;
         /// Finalmente, al final de toda la función, se hace
         /// "pop" del contexto en el que nos encontrabamos...
         /// es decir, de la barra circular de carga en la que
@@ -126,20 +135,35 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
     strAlmuerzos = ""; //Se reinicia por si acaso
     for (int i = 0; i < almuerzos.length; i++) {
       Map<String, dynamic> almuerzo = almuerzos[i];
-      if (almuerzo['Seco'] == null || almuerzo['Principio'] == null || almuerzo['Bebida'] == null) {
-        showCustomErrorDialog(context, 
-          "!Almuerzo #${i+1} Incompleto!\n\nProteina: ${almuerzo['Seco']}\nPrincipio: ${almuerzo['Principio']}\nBebida: ${almuerzo['Bebida']}"
-        );
-        return false;
+      if(almuerzo['Especial'] != null ){
+          String almuerzoString = '- ${almuerzo['Especial']}'; 
+          if (almuerzo['Bebida'] != null) {
+            almuerzoString += ' + ${almuerzo['Bebida']}';
+          }
+          if (almuerzo['Complemento'] != null) {
+            almuerzoString += ' + ${almuerzo['Complemento']}';
+          }
+          strAlmuerzos += '$almuerzoString.\n';
       }
-      String almuerzoString = '- ${almuerzo['Seco']} + ${almuerzo['Principio']} + ${almuerzo['Bebida']}';
-      if (almuerzo['Sopa'] != null) {
-        almuerzoString += ' + ${almuerzo['Sopa']}';
-      }
-      if (almuerzo['Complemento'] != null) {
-        almuerzoString += ' + ${almuerzo['Complemento']}';
-      }
-      strAlmuerzos += '$almuerzoString.\n';
+      else{
+        if (almuerzo['Seco'] == null || almuerzo['Principio'] == null) {
+          showCustomErrorDialog(context, 
+            "!Almuerzo #${i+1} Incompleto!\n\nProteina: ${almuerzo['Seco']}\nPrincipio: ${almuerzo['Principio']}}"
+          );
+          return false;
+        }
+        String almuerzoString = '- ${almuerzo['Seco']} + ${almuerzo['Principio']}';
+          if (almuerzo['Bebida'] != null) {
+            almuerzoString += ' + ${almuerzo['Bebida']}';
+          }
+          if (almuerzo['Sopa'] != null) {
+            almuerzoString += ' + ${almuerzo['Sopa']}';
+          }
+          if (almuerzo['Complemento'] != null) {
+            almuerzoString += ' + ${almuerzo['Complemento']}';
+          }
+          strAlmuerzos += '$almuerzoString.\n';
+      } 
     }
      strAlmuerzos = strAlmuerzos.trim();
      return true;
@@ -190,7 +214,14 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
   }
 
   InkWell buildPlatilloCardInnerData(Map<String, dynamic> diccionarioPlatillo) {
+    final supabase = Supabase.instance.client;
     String categoria = diccionarioPlatillo['categoria_alimenticia'];
+    final idPlatillo = diccionarioPlatillo['id'];
+    final path = 'IDPlatillo/$idPlatillo/imagenPlatillo';
+    String imageRoute = supabase.storage.from('platillos').getPublicUrl(path); 
+    /*imageRoute = Uri.parse(imageRoute).replace(queryParameters: {
+      't': DateTime.now().millisecond.toString()
+      }).toString();*/
 
     return InkWell(
       child: Column(
@@ -201,9 +232,9 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
               ClipRRect(
                 borderRadius: BorderRadius.circular(13.0),
                 child: Image.network(
-                  diccionarioPlatillo['imagen'],
-                  width: 100,
-                  height: 100,
+                  imageRoute,
+                  width: 120,
+                  height: 120,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -281,20 +312,57 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
                                   'Ya se selecciono un platillo para esta sección: \n\nAlmuerzo #$indice\nCategoria: $categoria\nPlatillo = $seleccionado'
                                 );
                                 return;
-                              }
+                              }  
+                              if(categoria == 'Especial'){
                                 setState(() {
-                                if (value == true) {
-                                  // Si el checkbox se marca, asigna el nombre del platillo al almuerzo
-                                  almuerzos[almuerzoIndex1][categoria] = diccionarioPlatillo['nombre'];
-                                  multiSeleccionarPlatillos(diccionarioPlatillo);
-                                  //print(almuerzos[almuerzoIndex1][categoria]);
-                                } else {
-                                  // Si el checkbox se desmarca, asigna null al almuerzo
-                                  almuerzos[almuerzoIndex1][categoria] = null;
-                                 multiDeSeleccionarPlatillos(diccionarioPlatillo);
-                                  //print(almuerzos[almuerzoIndex1][categoria]);
-                                }
-                              });
+                                  if (value == true) {
+                                    // Si el checkbox se marca, asigna el nombre del platillo al almuerzo
+                                    almuerzos[almuerzoIndex1][categoria] = diccionarioPlatillo['nombre'];
+                                    multiSeleccionarPlatillos(diccionarioPlatillo);
+                                    final aux = ['Seco', 'Principio', 'Sopa'];
+                                    for(var cat in aux){
+                                      if(almuerzos[almuerzoIndex1][cat] != null){
+                                        Map<String, dynamic> platAux = buscarPlatillo(almuerzos[almuerzoIndex1][cat], cat);
+                                        multiDeSeleccionarPlatillos(platAux);
+                                        //print(almuerzos[almuerzoIndex1][cat]);
+                                        //print(platAux['nombre']);
+                                        almuerzos[almuerzoIndex1][cat] = null;
+                                      }
+                                    }
+                                  } else {
+                                    // Si el checkbox se desmarca, asigna null al almuerzo
+                                    almuerzos[almuerzoIndex1][categoria] = null;
+                                    multiDeSeleccionarPlatillos(diccionarioPlatillo);
+                                    //print(almuerzos[almuerzoIndex1][categoria]);
+                                  }
+                                }); 
+                              }
+                              else{
+                                 if (almuerzos[almuerzoIndex1]['Especial'] != null && (['Seco', 'Principio', 'Sopa'].contains(categoria))){
+                                  String seleccionado = almuerzos[almuerzoIndex1]['Especial'];
+                                  int indice = almuerzoIndex1 + 1;
+                                  showCustomErrorDialog(
+                                    context, 
+                                    'El almuerzo #$indice es un especial: \n($seleccionado)\n\n¡No aplica selecionar ni el principio, ni el seco, ni la sopa!'
+                                  );
+                                  return;
+                                 }
+                                 else{
+                                  setState(() {
+                                    if (value == true) {
+                                      // Si el checkbox se marca, asigna el nombre del platillo al almuerzo
+                                      almuerzos[almuerzoIndex1][categoria] = diccionarioPlatillo['nombre'];
+                                      multiSeleccionarPlatillos(diccionarioPlatillo);
+                                      //print(almuerzos[almuerzoIndex1][categoria]);
+                                    } else {
+                                      // Si el checkbox se desmarca, asigna null al almuerzo
+                                      almuerzos[almuerzoIndex1][categoria] = null;
+                                      multiDeSeleccionarPlatillos(diccionarioPlatillo);
+                                      //print(almuerzos[almuerzoIndex1][categoria]);
+                                    }
+                                  });  
+                                 }                              
+                              }
                             },
                           ),
                           Expanded(
@@ -316,7 +384,6 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
                             Checkbox(
                               value: almuerzos[almuerzoIndex2][categoria] == diccionarioPlatillo['nombre'],
                               onChanged: (bool? value) {
-                                
                                 if (almuerzos[almuerzoIndex2][categoria] != diccionarioPlatillo['nombre'] && almuerzos[almuerzoIndex2][categoria] != null) {
                                   String seleccionado = almuerzos[almuerzoIndex2][categoria];
                                   int indice = almuerzoIndex2 + 1;
@@ -327,19 +394,56 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
                                   return;
                                 }
 
-                                setState(() {
-                                if (value == true) {
-                                  // Si el checkbox se marca, asigna el nombre del platillo al almuerzo
-                                  almuerzos[almuerzoIndex2][categoria] = diccionarioPlatillo['nombre'];
-                                  multiSeleccionarPlatillos(diccionarioPlatillo);
-                                  //print(almuerzos[almuerzoIndex2][categoria]);
-                                } else {
-                                  // Si el checkbox se desmarca, asigna null al almuerzo
-                                  almuerzos[almuerzoIndex2][categoria] = null;
-                                  multiDeSeleccionarPlatillos(diccionarioPlatillo);
-                                  //print(almuerzos[almuerzoIndex2][categoria]);
-                                }
-                              });
+                                if(categoria=='Especial'){
+                                  setState(() {
+                                  if (value == true) {
+                                    // Si el checkbox se marca, asigna el nombre del platillo al almuerzo
+                                    almuerzos[almuerzoIndex2][categoria] = diccionarioPlatillo['nombre'];
+                                    multiSeleccionarPlatillos(diccionarioPlatillo);
+                                    final aux = ['Seco', 'Principio', 'Sopa'];
+                                    for(var cat in aux){
+                                      if(almuerzos[almuerzoIndex2][cat] != null){
+                                        Map<String, dynamic> platAux = buscarPlatillo(almuerzos[almuerzoIndex2][cat], cat);
+                                        multiDeSeleccionarPlatillos(platAux);
+                                        //print(almuerzos[almuerzoIndex2][cat]);
+                                        //print(platAux['nombre']);
+                                        almuerzos[almuerzoIndex2][cat] = null;
+                                      }
+                                    }
+                                  } else {
+                                    // Si el checkbox se desmarca, asigna null al almuerzo
+                                    almuerzos[almuerzoIndex2][categoria] = null;
+                                    multiDeSeleccionarPlatillos(diccionarioPlatillo);
+                                    //print(almuerzos[almuerzoIndex1][categoria]);
+                                  }
+                                }); 
+                              }
+                              else{
+                                  if (almuerzos[almuerzoIndex2]['Especial'] != null && (['Seco', 'Principio', 'Sopa'].contains(categoria))){
+                                    String seleccionado = almuerzos[almuerzoIndex2]['Especial'];
+                                    int indice = almuerzoIndex2 + 1;
+                                    showCustomErrorDialog(
+                                      context, 
+                                      'El almuerzo #$indice es un especial: \n($seleccionado)\n\n¡No aplica selecionar ni el principio, ni el seco, ni la sopa!'
+                                    );
+                                    return;
+                                  }
+                                  else{
+                                    setState(() {
+                                      if (value == true) {
+                                        // Si el checkbox se marca, asigna el nombre del platillo al almuerzo
+                                        almuerzos[almuerzoIndex2][categoria] = diccionarioPlatillo['nombre'];
+                                        multiSeleccionarPlatillos(diccionarioPlatillo);
+                                        //print(almuerzos[almuerzoIndex2][categoria]);
+                                      } else {
+                                        // Si el checkbox se desmarca, asigna null al almuerzo
+                                        almuerzos[almuerzoIndex2][categoria] = null;
+                                        multiDeSeleccionarPlatillos(diccionarioPlatillo);
+                                        //print(almuerzos[almuerzoIndex2][categoria]);
+                                      }
+                                    });
+                                  }
+                                }   
                               },
                             ),
                             Expanded(
@@ -364,6 +468,25 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
     );
   }
 
+  Map<String, dynamic> buscarPlatillo(String nombre, String cat) {
+  switch (cat) {
+    case 'Seco':
+      return platillos.firstWhere(
+          (platillo) => platillo['nombre'] == nombre,
+          orElse: () => {});
+    case 'Principio':
+      return principios.firstWhere(
+          (platillo) => platillo['nombre'] == nombre,
+          orElse: () => {});
+    case 'Sopa':
+      return complementos.firstWhere(
+          (platillo) => platillo['nombre'] == nombre,
+          orElse: () => {});
+    default:
+      return {};
+  }
+}
+
   void showCircularProgressIndicator() {
 
     showDialog(
@@ -382,7 +505,6 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
             child: CircularProgressIndicator(),
           )
         );
-
       })
     );
   }
@@ -391,7 +513,7 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 3,
+        length: 4,
         child: Scaffold(
           appBar: AppBar(
             iconTheme: const IconThemeData(color: EsquemaDeColores.onPrimary),
@@ -408,9 +530,10 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
                 child: TabBar(
                   controller: tabController,
                   tabs: const [
+                    Tab(icon: Icon(Icons.fastfood_sharp, color: EsquemaDeColores.onPrimary)),
                     Tab(icon: Icon(Icons.local_dining, color: EsquemaDeColores.onPrimary)),
                     Tab(icon: Icon(Icons.rice_bowl, color: EsquemaDeColores.onPrimary) ),
-                    Tab(icon: Icon(Icons.local_drink, color: EsquemaDeColores.onPrimary)),
+                    Tab(icon: Icon(Icons.local_drink, color: EsquemaDeColores.onPrimary))
                   ],
                 ),
               ),
@@ -419,6 +542,7 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
           body: TabBarView(
             controller: tabController,
             children: [
+              _buildListView(especiales, 'especiales'),
               _buildListView(platillos, 'seco'),
               _buildListView(principios, 'principios'),
               _buildListView(complementos, 'bebidas')
@@ -560,6 +684,29 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
                         platillosFiltrados = platillosConFiltros;
                       });
                       break;
+
+                    case 'especiales':
+                        platillosConFiltros = especiales
+                            .where((platillo) => platillo['nombre']
+                                .toString()
+                                .toLowerCase()
+                                .contains(nombre.toLowerCase()))
+                            .toList();
+
+                        if (platillosConFiltros.isEmpty) {
+                          showCustomErrorDialog(context,
+                              "¡No hay ningun plato que tenga en su nombre: '$nombre'!");
+                          setState(() {
+                            platillosFiltrados = [];
+                          });
+                          platilloController.clear();
+                          return;
+                        }
+
+                        setState(() {
+                          platillosFiltrados = platillosConFiltros;
+                        });
+                        break;
                     default:
                   }
                 },
