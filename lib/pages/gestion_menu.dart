@@ -14,17 +14,21 @@ class GestionMenu extends StatefulWidget {
   State<GestionMenu> createState() => _GestionMenuState();
 }
 
-class _GestionMenuState extends State<GestionMenu>{
+class _GestionMenuState extends State<GestionMenu> with SingleTickerProviderStateMixin{
   final supabase = Supabase.instance.client;
   final TextEditingController platilloController = TextEditingController();
   List<Map<String, dynamic>> platillos = [];
   List<Map<String, dynamic>> principios = [];
   List<Map<String, dynamic>> complementos = [];
+  List<Map<String, dynamic>> especiales = [];
   List<Map<String, dynamic>> platillosFiltrados = [];
+  late TabController tabController;
 
   @override
   void initState() {
     super.initState();
+    tabController = TabController(vsync: this, length: 4);
+    tabController.addListener(handleTabChange);
     cargarPlatillos();
   }
 
@@ -47,17 +51,32 @@ class _GestionMenuState extends State<GestionMenu>{
                   .or('categoria_alimenticia.eq.Bebida, categoria_alimenticia.eq.Sopa')
                   .order('categoria_alimenticia', ascending: true);
     
+    final dataEsp = await supabase
+                  .from('Platillo')
+                  .select()
+                  .eq('categoria_alimenticia', 'Especial')
+                  .order('nombre', ascending: true);
+
     setState(() {
       platillos = dataPlatos;
       principios = dataPrinc;
       complementos = dataComp;
+      especiales = dataEsp;
+    });
+  }
+
+  //Función para reiniciar los filtros al cambiar de pestaña
+  void handleTabChange() {
+    platilloController.clear();
+    setState(() {
+      platillosFiltrados = [];
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, 
+      length: 4, 
       child: Scaffold(
       appBar: AppBar(
         backgroundColor: EsquemaDeColores.backgroundSecondary,
@@ -65,21 +84,25 @@ class _GestionMenuState extends State<GestionMenu>{
             preferredSize: const Size.fromHeight(0), // Eliminar espacio adicional
             child: Container(
               color: EsquemaDeColores.backgroundSecondary,
-              child: const TabBar(
-                tabs: [
+              child: TabBar(
+                controller: tabController,
+                tabs: const [
                   Tab(icon: Icon(Icons.rice_bowl)),
                   Tab(icon: Icon(Icons.local_dining)),
                   Tab(icon: Icon(Icons.local_drink)),
+                  Tab(icon: Icon(Icons.star_border_purple500))
                 ],
               ),
             ),
           ),
         ),
       body: TabBarView(
+          controller: tabController,
           children: [
             _buildTabContent(principios, 'principios'),
             _buildTabContent(platillos, 'seco'),
-            _buildTabContent(complementos, 'bebidas')
+            _buildTabContent(complementos, 'bebidas'),
+            _buildTabContent(especiales, 'especiales')
           ],
         ),
       ),
@@ -110,7 +133,14 @@ class _GestionMenuState extends State<GestionMenu>{
                         ),
                         contentPadding: const EdgeInsets.symmetric(vertical: 3),
                       ),
-                      onChanged: (value) {},
+                      onChanged: (value) {
+                        if( value == '' )
+                        {
+                          setState(() {
+                            platillosFiltrados = [];
+                          });
+                        }
+                      },
                     ),
                 ),
                 Padding(
@@ -143,6 +173,7 @@ class _GestionMenuState extends State<GestionMenu>{
                             platillosFiltrados = [];
                           });
                           platilloController.clear();
+                          return;
                         }
 
                         setState(() {
@@ -175,6 +206,29 @@ class _GestionMenuState extends State<GestionMenu>{
 
                       case 'bebidas':
                         platillosConFiltros = complementos
+                            .where((platillo) => platillo['nombre']
+                                .toString()
+                                .toLowerCase()
+                                .contains(nombre.toLowerCase()))
+                            .toList();
+
+                        if (platillosConFiltros.isEmpty) {
+                          showCustomErrorDialog(context,
+                              "¡No hay ningun plato que tenga en su nombre: '$nombre'!");
+                          setState(() {
+                            platillosFiltrados = [];
+                          });
+                          platilloController.clear();
+                          return;
+                        }
+
+                        setState(() {
+                          platillosFiltrados = platillosConFiltros;
+                        });
+                        break;
+
+                      case 'especiales':
+                        platillosConFiltros = especiales
                             .where((platillo) => platillo['nombre']
                                 .toString()
                                 .toLowerCase()
@@ -365,7 +419,7 @@ class _GestionMenuState extends State<GestionMenu>{
     String nombre = '';
     String descripcion = '';
     String precio = '';
-    List<String> listaCategorias = ['Seco', 'Principio', 'Bebida', 'Sopa', 'Complemento'];
+    List<String> listaCategorias = ['Especial', 'Seco', 'Principio', 'Bebida', 'Sopa', 'Complemento'];
     String categoria = listaCategorias.first; // Categoría por defecto
     XFile? image ;
 
@@ -638,7 +692,7 @@ class _GestionMenuState extends State<GestionMenu>{
     final precioController = TextEditingController();
     precioController.text = platillo['precio_unitario'].toString();
     //Dropdownbutton - Iniciar en el correcto:
-    List<String> listaCategorias = ['Seco', 'Principio', 'Bebida', 'Sopa', 'Complemento'];
+    List<String> listaCategorias = ['Especial', 'Seco', 'Principio', 'Bebida', 'Sopa', 'Complemento'];
     String categoria = listaCategorias.first;
     for (var i = 0; i < listaCategorias.length; i++) {
       if(listaCategorias[i]==platillo['categoria_alimenticia']){
