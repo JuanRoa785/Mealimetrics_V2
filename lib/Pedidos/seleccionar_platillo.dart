@@ -148,7 +148,7 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
       else{
         if (almuerzo['Seco'] == null || almuerzo['Principio'] == null) {
           showCustomErrorDialog(context, 
-            "!Almuerzo #${i+1} Incompleto!\n\nProteina: ${almuerzo['Seco']}\nPrincipio: ${almuerzo['Principio']}}"
+            "!Almuerzo #${i+1} Incompleto!\n\nProteina: ${almuerzo['Seco']}\nPrincipio: ${almuerzo['Principio']}"
           );
           return false;
         }
