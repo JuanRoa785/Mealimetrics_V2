@@ -5,6 +5,7 @@ import 'package:mealimetrics/widgets/home_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';
 import 'package:mealimetrics/pages/gestion_empleados.dart';
+import 'package:mealimetrics/Estadisticas/screens/home_stats.dart';
 
 class HomeGerente extends StatefulWidget {
   const HomeGerente({super.key});
@@ -52,7 +53,7 @@ class _HomeGerenteState extends State<HomeGerente> {
         index: _selectedIndex,
         children: const [
           GestionEmpleados(),
-          Center(child: Text('Contenido de la página 2')),
+          HomeStats(supabaseUrl: '', supabaseKey: '',),
           GestionMenu(),
         ],
       ),
