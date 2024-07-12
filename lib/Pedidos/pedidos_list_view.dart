@@ -485,6 +485,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
                     .from('Pedido')
                     .delete()
                     .match({ 'id': pedido['id'] });
+                  obtenerPedidos();
                 } catch (e) {
                   showCustomErrorDialog(context, e.toString());
                   return;
