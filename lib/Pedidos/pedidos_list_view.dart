@@ -19,6 +19,7 @@ class PedidosListView extends ConsumerStatefulWidget{
 }
 
 class _PedidosListView extends ConsumerState<PedidosListView>{
+  final supabase = Supabase.instance.client;
   String _idMesero = '';
   final List<DropdownMenuItem<String>> _listaDeEstadosDePedido = buildListaDeEstados();
   final List<String> _listaDeMesas = ['Todas', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
@@ -141,7 +142,7 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
   }
 
   //método para crear las card
-  Widget pedidoCard( Map<String, dynamic> pedido ){
+  Widget pedidoCard(Map<String, dynamic> pedido){
     String aux = '${pedido["paraLlevar"]}';
     String paraLlevar = '${aux[0].toUpperCase()}${aux.substring(1)}';
     Color cardColor = pedido['estado'] == 'Emplatado' ? const Color.fromARGB(255, 255, 176, 29) : EsquemaDeColores.secondary;
@@ -162,32 +163,49 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            RichText(
-              text: TextSpan(
-                children: [
-                  const TextSpan(
-                    text: 'Cliente: ',
-                    style: TextStyle(
-                      color: EsquemaDeColores.onPrimary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children:[
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Cliente: ',
+                        style: TextStyle(
+                          color: EsquemaDeColores.onPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const TextSpan(text:" "),
+                      TextSpan(
+                        text: pedido["cliente"],
+                        style: const TextStyle(
+                          color: EsquemaDeColores.primary,
+                          fontSize: 17,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                    ],
                   ),
-                  const TextSpan(text:" "),
-                  TextSpan(
-                    text: pedido["cliente"],
-                    style: const TextStyle(
-                      color: EsquemaDeColores.primary,
-                      fontSize: 17,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.bold
-                    ),
+                ),
+                Container(
+                  width: 36, 
+                  height: 36,
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle, 
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 7.0,
+                  child: IconButton(
+                    icon: const Icon(Icons.close, size: 30.0, color:Colors.white), 
+                    onPressed: () {
+                      eliminarPedido(pedido);
+                    },
+                    padding: EdgeInsets.zero
+                  ),
+                ),
+              ]
             ),
             RichText(
               text: TextSpan(
@@ -424,6 +442,89 @@ class _PedidosListView extends ConsumerState<PedidosListView>{
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> eliminarPedido(Map<String, dynamic> pedido) async {
+    await showDialog(
+      context:context,
+      builder: (BuildContext context){
+        return AlertDialog(
+          title: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "¿Esta Seguro?",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  color: Colors.red,
+                ),
+              ),     
+            ],
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+          content: Column(
+          mainAxisSize: MainAxisSize.min, 
+          children: [
+            const Text(
+              "Eliminar este pedido es irreversible y su información no podrá ser recuperada.",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 21,
+                color: EsquemaDeColores.onSecondary,
+              ),
+              textAlign: TextAlign.justify,
+            ),
+            const SizedBox(height: 10), 
+            ElevatedButton(
+              onPressed: () async {
+                //Eliminamos el pedido
+                try {
+                  await supabase
+                    .from('Pedido')
+                    .delete()
+                    .match({ 'id': pedido['id'] });
+                } catch (e) {
+                  showCustomErrorDialog(context, e.toString());
+                  return;
+                }
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red, 
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10), 
+                ),
+              ),
+              child: const Text(
+                'Eliminar',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: EsquemaDeColores.onPrimary
+                ),
+              ),
+            ),
+          ],
+        ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Volver Atrás',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      }
     );
   }
 

@@ -973,7 +973,7 @@ class _GestionMenuState extends State<GestionMenu> with SingleTickerProviderStat
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "¿Esta Seguro?",
+                "¿Está Seguro?",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 28,
@@ -1051,7 +1051,7 @@ class _GestionMenuState extends State<GestionMenu> with SingleTickerProviderStat
                 Navigator.of(context).pop();
               },
               child: const Text(
-                'OK',
+                'Volver Atrás',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.blue,
