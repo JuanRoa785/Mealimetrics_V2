@@ -7,7 +7,7 @@ En caso de que desees ejecutar el software debes seguir los siguientes pasos:
 1. Instalar Flutter en tu equipo
 2. Clonar el Repositorio
    ```bash
-   git clone <La url de este repositorio>
+   git clone https://github.com/JuanRoa785/mealimetrics.git
 3. Instalar las dependencias adecuadas:
    ```bash
     flutter pub get
