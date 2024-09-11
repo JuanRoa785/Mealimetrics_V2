@@ -253,7 +253,7 @@ class _GestionMenuState extends State<GestionMenu> with SingleTickerProviderStat
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: EsquemaDeColores.background,
+                    backgroundColor: EsquemaDeColores.surface,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

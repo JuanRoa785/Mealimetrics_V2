@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'package:intl/intl.dart';
 import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
@@ -107,28 +107,27 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
                 onPressed: actualizarTexto,
               ),
               const SizedBox(height: 35.0),
-              FFButtonWidget(
-                onPressed: () => actualizarPassword(),
-                text: 'Actualizar Contraseña',
-                options: FFButtonOptions(
-                  width: 230,
-                  height: 42,
-                  padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                  iconPadding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                  color: const Color.fromARGB(255, 4, 88, 254),
-                  textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                        fontFamily: 'Plus Jakarta Sans',
-                        color: Colors.white,
-                        fontSize: 16,
-                        letterSpacing: 0,
-                        fontWeight: FontWeight.w500,
-                      ),
-                  elevation: 3,
-                  borderSide: const BorderSide(
-                    color: Colors.transparent,
-                    width: 1,
+              ElevatedButton(
+                onPressed: actualizarPassword, // O puedes usar una función anónima () => actualizarPassword()
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(230, 42), // Tamaño del botón
+                  padding: const EdgeInsets.all(0), // Padding alrededor del contenido
+                  backgroundColor: const Color.fromARGB(255, 4, 88, 254), // Color de fondo del botón
+                  elevation: 3, // Elevación del botón
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40), // Bordes redondeados
+                    side: const BorderSide(color: Colors.transparent, width: 1), // Borde del botón
                   ),
-                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: const Text(
+                  'Actualizar Contraseña',
+                  style: TextStyle(
+                    fontFamily: 'Plus Jakarta Sans',
+                    color: Colors.white,
+                    fontSize: 16,
+                    letterSpacing: 0,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
@@ -181,7 +180,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: EsquemaDeColores.background,
+          backgroundColor: EsquemaDeColores.surface,
           title: Align(
             alignment: Alignment.center,
             child: Text(
@@ -264,7 +263,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: EsquemaDeColores.background,
+          backgroundColor: EsquemaDeColores.surface,
           title: Center(
             child: Text("Actualizar $parametro"),
           ),
@@ -354,7 +353,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: EsquemaDeColores.background,
+          backgroundColor: EsquemaDeColores.surface,
           title: Align(
             alignment: Alignment.center,
             child: Text(
@@ -375,7 +374,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
                       dropdownValue = value!;
                     });
                   },
-                  dropdownColor: EsquemaDeColores.background,
+                  dropdownColor: EsquemaDeColores.surface,
                   items: lista.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -434,7 +433,7 @@ class _ActualizarDatosState extends State<ActualizarDatos> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: EsquemaDeColores.background,
+          backgroundColor: EsquemaDeColores.surface,
           title: Align(
           alignment: Alignment.center,
           child: Text(
@@ -563,7 +562,7 @@ class PasswordDialogState extends State<PasswordDialog> {
   @override
   Widget build(BuildContext context) {
       return AlertDialog(
-        backgroundColor: EsquemaDeColores.background,
+        backgroundColor: EsquemaDeColores.surface,
         title: const Align(
           alignment: Alignment.center,
           child: Text(

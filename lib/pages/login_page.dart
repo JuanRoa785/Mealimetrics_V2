@@ -5,11 +5,10 @@ import 'package:mealimetrics/pages/home_chef.dart';
 import 'package:mealimetrics/pages/home_mesero.dart';
 import 'package:mealimetrics/pages/modal_recuperacion.dart';
 import 'package:mealimetrics/pages/home_gerente.dart';
-import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mealimetrics/widgets/home_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
-import 'package:mealimetrics/Styles/color_scheme.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -88,30 +87,27 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     height: 10.0,
                   ),
-                  FFButtonWidget(
+                  ElevatedButton(
                     onPressed: () => signIn(context),
-                    text: 'Iniciar Sesion',
-                    options: FFButtonOptions(
-                      width: 230,
-                      height: 52,
-                      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                      iconPadding:
-                          const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                      color: const Color(0xFF4B39EF),
-                      textStyle:
-                          FlutterFlowTheme.of(context).titleSmall.override(
-                                fontFamily: 'Plus Jakarta Sans',
-                                color: Colors.white,
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w500,
-                              ),
-                      elevation: 3,
-                      borderSide: const BorderSide(
-                        color: Colors.transparent,
-                        width: 1,
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(230, 52), // Tamaño del botón
+                      padding: const EdgeInsets.all(0), // Padding alrededor del contenido
+                      backgroundColor: const Color(0xFF4B39EF), // Color de fondo del botón
+                      elevation: 3, // Elevación del botón
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(40), // Bordes redondeados
+                        side: const BorderSide(color: Colors.transparent, width: 1), // Borde del botón
                       ),
-                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: Text(
+                      'Iniciar Sesión',
+                      style: TextStyle(
+                        fontFamily: 'Plus Jakarta Sans',
+                        color: Colors.white,
+                        fontSize: 16,
+                        letterSpacing: 0,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -136,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                       },
                       style: ButtonStyle(
                         foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.blue),
+                            WidgetStatePropertyAll<Color>(Colors.blue),
                       ),
                       child: Text('Olvidaste Tu contraseña?',
                           style: TextStyle(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mealimetrics/Styles/color_scheme.dart';
 import 'package:mealimetrics/pages/gestion_menu.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/home_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';

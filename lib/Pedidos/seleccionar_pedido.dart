@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mealimetrics/pages/home_mesero.dart';
-import '..\\Styles\\color_scheme.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 import 'formularios\\pedido_formulario.dart';
 
 class SeleccionarPedido extends StatelessWidget {

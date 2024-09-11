@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mealimetrics/pages/login_page.dart';
 import 'package:mealimetrics/pages/register_page.dart';
-import 'package:mealimetrics/Styles/color_scheme.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 
 class Home extends StatefulWidget{
   

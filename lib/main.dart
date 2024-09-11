@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mealimetrics/widgets/home_widget.dart';
 import 'package:mealimetrics/widgets/actualizar_datos.dart';
-import 'package:mealimetrics/Styles/color_scheme.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mealimetrics/Pedidos/seleccionar_pedido.dart';
 import 'package:mealimetrics/Pedidos/pedidos_main.dart';

@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mealimetrics/Pedidos/Excepciones/cantidad_platillo.dart';
 import 'package:mealimetrics/Pedidos/estados/cuantos_platillos_quiere.dart';
-import 'package:mealimetrics/Styles/color_scheme.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 
 class SeleccionarCantidadPlatillos extends ConsumerStatefulWidget {
@@ -31,7 +31,7 @@ class _SeleccionarCantidadPlatillosState extends ConsumerState<SeleccionarCantid
   @override
   Widget build(BuildContext context) {
     return  SimpleDialog(
-      backgroundColor: EsquemaDeColores.background, 
+      backgroundColor: EsquemaDeColores.surface, 
       contentPadding: const EdgeInsets.all(10),
       title: const Text(
         '¿Cuantos platillos desea?',
@@ -76,7 +76,7 @@ class _SeleccionarCantidadPlatillosState extends ConsumerState<SeleccionarCantid
         TextButton(
           
           style: const ButtonStyle(
-            backgroundColor: MaterialStatePropertyAll(EsquemaDeColores.primary),
+            backgroundColor: WidgetStatePropertyAll(EsquemaDeColores.primary),
           ),
 
 

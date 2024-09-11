@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:mealimetrics/widgets/custom_alert.dart';
-import 'package:flutterflow_ui/flutterflow_ui.dart';
 
 class ModalRecuperacionWidget extends StatefulWidget {
   const ModalRecuperacionWidget({super.key});
@@ -129,31 +128,30 @@ class _ModalRecuperacionWidgetState extends State<ModalRecuperacionWidget> {
                 Align(
                   alignment: Alignment.center,
                   child: 
-                  FFButtonWidget(
+                  ElevatedButton(
                     onPressed: () {
                       final userName = _emailAddressController.text;
                       enviarCorreo(userName, context);
                     },
-                    text: 'Enviar Correo',
-                    options: FFButtonOptions(
-                      width: 250,
-                      height: 40,
-                      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                      iconPadding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                      color: const Color.fromARGB(255, 4, 88, 254),
-                      textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                            fontFamily: 'Plus Jakarta Sans',
-                            color: Colors.white,
-                            fontSize: 17,
-                            letterSpacing: 0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                      elevation: 3,
-                      borderSide: const BorderSide(
-                        color: Colors.transparent,
-                        width: 1,
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(250, 40), // Tamaño del botón
+                      padding: const EdgeInsets.all(0), // Padding alrededor del contenido
+                      backgroundColor: const Color.fromARGB(255, 4, 88, 254), // Color de fondo del botón
+                      elevation: 3, // Elevación del botón
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(40), // Bordes redondeados
+                        side: const BorderSide(color: Colors.transparent, width: 1), // Borde del botón
                       ),
-                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: const Text(
+                      'Enviar Correo',
+                      style: TextStyle(
+                        fontFamily: 'Plus Jakarta Sans',
+                        color: Colors.white,
+                        fontSize: 17,
+                        letterSpacing: 0,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),

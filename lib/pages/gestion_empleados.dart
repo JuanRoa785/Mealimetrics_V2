@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -186,31 +185,30 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                 ),
               ],
             ),
-            FFButtonWidget(
+            ElevatedButton(
               onPressed: () async {
                 cargarEmpleados();
                 //print(filterController.text.trim());
               },
-              text: '¡Aplicar Filtros!',
-              options: FFButtonOptions(
-                width: 250,
-                height: 32,
-                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                iconPadding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                color: const Color.fromARGB(255, 4, 88, 254),
-                textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                      fontFamily: 'Plus Jakarta Sans',
-                      color: Colors.white,
-                      fontSize: 17,
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.w500,
-                    ),
-                elevation: 3,
-                borderSide: const BorderSide(
-                  color: Colors.transparent,
-                  width: 1,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(250, 32), // Tamaño del botón
+                padding: const EdgeInsets.all(0), // Padding alrededor del contenido
+                backgroundColor: const Color.fromARGB(255, 4, 88, 254), // Color de fondo del botón
+                elevation: 3, // Elevación del botón
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(40), // Bordes redondeados
+                  side: const BorderSide(color: Colors.transparent, width: 1), // Borde del botón
                 ),
-                borderRadius: BorderRadius.circular(40),
+              ),
+              child: const Text(
+                '¡Aplicar Filtros!',
+                style: TextStyle(
+                  fontFamily: 'Plus Jakarta Sans',
+                  color: Colors.white,
+                  fontSize: 17,
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             const SizedBox(
@@ -343,14 +341,15 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FFButtonWidget(
+                    ElevatedButton(
                       onPressed: () async {
                         try {
                           await supabase.from('empleado').update({
                             'estado_cuenta': empleado['estado_cuenta'],
-                            'rol': empleado['rol']
-                          }).match(
-                              {'correo_electronico': empleado['correo_electronico']});
+                            'rol': empleado['rol'],
+                          }).match({
+                            'correo_electronico': empleado['correo_electronico'],
+                          });
                         } catch (e) {
                           showCustomErrorDialog(context, e.toString());
                           return;
@@ -358,28 +357,28 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                         showCustomExitDialog(context, 'Actualización exitosa');
                         cargarEmpleados();
                       },
-                      text: 'Actualizar Empleado',
-                      options: FFButtonOptions(
-                        width: 250,
-                        height: 32,
-                        padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                        iconPadding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                        color: const Color.fromARGB(255, 4, 88, 254),
-                        textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                              fontFamily: 'Plus Jakarta Sans',
-                              color: Colors.white,
-                              fontSize: 17,
-                              letterSpacing: 0,
-                              fontWeight: FontWeight.w500,
-                            ),
-                        elevation: 3,
-                        borderSide: const BorderSide(
-                          color: Colors.transparent,
-                          width: 1,
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(250, 32), // Tamaño del botón
+                        padding: const EdgeInsets.all(0), // Padding alrededor del contenido
+                        backgroundColor: const Color.fromARGB(255, 4, 88, 254), // Color de fondo
+                        elevation: 3, // Elevación del botón
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40), // Bordes redondeados
+                          side: const BorderSide(color: Colors.transparent, width: 1), // Borde del botón
                         ),
-                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      child: const Text(
+                        'Actualizar Empleado',
+                        style: TextStyle(
+                          fontFamily: 'Plus Jakarta Sans',
+                          color: Colors.white,
+                          fontSize: 17,
+                          letterSpacing: 0,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
+
                   ],
                 ),
               ],

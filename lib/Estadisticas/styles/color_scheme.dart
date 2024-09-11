@@ -22,12 +22,10 @@ class MyColorScheme extends ColorScheme {
           primary: EsquemaDeColores.primary,// Si no hay variantes, usa el mismo color primario
           secondary: EsquemaDeColores.secondary, // Si no hay variantes, usa el mismo color secundario
           surface: EsquemaDeColores.surface,
-          background: EsquemaDeColores.background,
           error: EsquemaDeColores.error,
           onPrimary: EsquemaDeColores.onPrimary,
           onSecondary: EsquemaDeColores.onSecondary,
           onSurface: EsquemaDeColores.onSurface,
-          onBackground: EsquemaDeColores.onBackground,
           onError: EsquemaDeColores.onError,
           brightness: EsquemaDeColores.brightness,
         );

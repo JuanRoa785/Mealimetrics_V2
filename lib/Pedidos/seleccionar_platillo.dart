@@ -4,7 +4,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mealimetrics/Pedidos/estados/cuantos_platillos_quiere.dart';
-import 'package:mealimetrics/Styles/color_scheme.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
@@ -563,7 +563,7 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
               },
               style: const ButtonStyle(
                 backgroundColor:
-                    MaterialStatePropertyAll(EsquemaDeColores.primary),
+                    WidgetStatePropertyAll(EsquemaDeColores.primary),
               ),
               child: const Text(
                 'Listo',
@@ -711,7 +711,7 @@ class _SeleccionarPlatilloState extends ConsumerState<SeleccionarPlatillo> with 
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: EsquemaDeColores.background,
+                  backgroundColor: EsquemaDeColores.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),

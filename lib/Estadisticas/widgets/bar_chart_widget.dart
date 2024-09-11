@@ -31,8 +31,8 @@ class BarChartWidget extends StatelessWidget {
             alignment: BarChartAlignment.spaceAround,
             barGroups: barGroups,
             titlesData: FlTitlesData(
-              topTitles:AxisTitles(sideTitles: SideTitles(reservedSize: 6, showTitles: false)),
-              rightTitles:AxisTitles(sideTitles: SideTitles(reservedSize: 6, showTitles: false)),
+              topTitles:const AxisTitles(sideTitles: SideTitles(reservedSize: 6, showTitles: false)),
+              rightTitles:const AxisTitles(sideTitles: SideTitles(reservedSize: 6, showTitles: false)),
               leftTitles:AxisTitles(
                 sideTitles: SideTitles( 
                   showTitles: true,

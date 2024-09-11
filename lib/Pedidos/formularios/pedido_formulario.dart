@@ -9,9 +9,9 @@ import 'package:mealimetrics/Pedidos/estados/cuantos_platillos_quiere.dart';
 import 'package:mealimetrics/Pedidos/estados/modelo_lista_pedidos.dart';
 import 'package:mealimetrics/Pedidos/seleccionar_platillo.dart';
 import 'package:mealimetrics/pages/home_mesero.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '..\\..\\Styles\\color_scheme.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
 
@@ -230,7 +230,7 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                     child: ElevatedButton(
 
                       style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(EsquemaDeColores.primary),
+                        backgroundColor: WidgetStatePropertyAll(EsquemaDeColores.primary),
                       ),
 
                       onPressed: () {
@@ -410,8 +410,8 @@ class _PedidoFormularioState extends ConsumerState<PedidoFormulario> {
                 },
                           
                 style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(EsquemaDeColores.secondary),
-                  padding: MaterialStatePropertyAll( EdgeInsets.all(15) ),
+                  backgroundColor: WidgetStatePropertyAll(EsquemaDeColores.secondary),
+                  padding: WidgetStatePropertyAll( EdgeInsets.all(15) ),
                 ),
                 
                 child: const Text(

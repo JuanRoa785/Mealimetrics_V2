@@ -3,11 +3,11 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'package:intl/intl.dart';
 import 'package:mealimetrics/widgets/custom_alert.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'estados\\modelo_lista_pedidos.dart';
-import '..\\Styles\\color_scheme.dart';
+import 'package:mealimetrics/styles/color_scheme.dart';
 import 'dart:async';
 
 

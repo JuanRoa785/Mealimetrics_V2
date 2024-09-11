@@ -40,12 +40,12 @@ class _HomeStatsState extends State<HomeStats> with SingleTickerProviderStateMix
     return getOrderedDishSales(dishes, orderDishes);
   }
 
-  Future<Map<DateTime, double>> _loadSalesByDate(String filtro) async {
+  /*Future<Map<DateTime, double>> _loadSalesByDate(String filtro) async {
     final dishes = await supabaseService.getDishes(filtro);
     final orders = await supabaseService.getOrders();
     final orderDishes = await supabaseService.getOrderDishes();
     return calculateSalesByDate(dishes, orders, orderDishes);
-  }
+  }*/
 
   Map<String, int> calculateDishSales(List<models.Dish> dishes, List<services.OrderDish> orderDishes) {
     Map<int, int> dishSales = {};
