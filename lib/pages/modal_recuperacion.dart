@@ -180,10 +180,10 @@ String generarContrasena(){
 
 void enviarCorreo(String userName, context) async {
   //Estos datos solo se muestran en desarrollo, a nivel de producción deben ser encriptados
-  final supaAdmin = SupabaseClient('https://ddyveuettsjaxmdbijgb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkeXZldWV0dHNqYXhtZGJpamdiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxMzA1MDgzNCwiZXhwIjoyMDI4NjI2ODM0fQ.FoRjsJj9d7R-XSkNN4hokmfmTG-mEcr2QuWWT9RFnxc');
+  final supaAdmin = SupabaseClient('https://fqsdytkispydwsmcbikh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxc2R5dGtpc3B5ZHdzbWNiaWtoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTUzNzA4MywiZXhwIjoyMDU3MTEzMDgzfQ.HG8nwPE4ev9pDbSo_rX519Skd3jT-q2tDcWCtIYICVY');
   final String password = generarContrasena();
   try {
-    if (userName == 'Admin') {
+    if (userName == 'RoaDev') {
       showCustomErrorDialog(context, "¡No se puede recuperar la cuenta maestra!\n\nComuniquese con el administrador del sistema para obtener la contraseña.");
       return;
     }

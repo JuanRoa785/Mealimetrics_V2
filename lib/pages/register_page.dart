@@ -371,7 +371,7 @@ class _RegisterPageState extends State<RegisterPage> {
           return;
         }
       } catch (e) {
-        showCustomErrorDialog(context, '¡Error interno de la DB!');
+        showCustomErrorDialog(context, e.toString());
         return;
       }
 

@@ -55,7 +55,7 @@ class _HomeMeseroState extends State<HomeMesero> {
 
   Future<void> signOut() async {
     final User? user = supabase.auth.currentUser;
-    if (user?.id == "effc93b2-b2d6-46bc-a6e8-983457c819dc") {
+    if (user?.id == "8554245a-6ee6-448c-89ee-742bd3bbf431") {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeAdmin()));
       return;
     }

@@ -53,7 +53,7 @@ class _HomeGerenteState extends State<HomeGerente> {
         index: _selectedIndex,
         children: const [
           GestionEmpleados(),
-          HomeStats(supabaseUrl: '', supabaseKey: '',),
+          HomeStats(supabaseUrl: 'https://fqsdytkispydwsmcbikh.supabase.co', supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxc2R5dGtpc3B5ZHdzbWNiaWtoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTUzNzA4MywiZXhwIjoyMDU3MTEzMDgzfQ.HG8nwPE4ev9pDbSo_rX519Skd3jT-q2tDcWCtIYICVY',),
           GestionMenu(),
         ],
       ),
@@ -87,7 +87,7 @@ class _HomeGerenteState extends State<HomeGerente> {
 
   Future<void> signOut() async {
     final User? user = supabase.auth.currentUser;
-    if (user?.id == "effc93b2-b2d6-46bc-a6e8-983457c819dc") {
+    if (user?.id == "8554245a-6ee6-448c-89ee-742bd3bbf431") {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const HomeAdmin()));
       return;
