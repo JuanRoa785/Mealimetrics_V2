@@ -144,7 +144,7 @@ class _HomeStatsState extends State<HomeStats> with SingleTickerProviderStateMix
                     const Text(
                       'Periodo de Tiempo:',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 17,
                         fontWeight: FontWeight.bold,
                         color: EsquemaDeColores.primary,
                       ),
@@ -164,7 +164,7 @@ class _HomeStatsState extends State<HomeStats> with SingleTickerProviderStateMix
                           child: Text(
                             value,
                             style: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

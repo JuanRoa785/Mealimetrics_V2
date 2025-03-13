@@ -78,9 +78,9 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
   Widget _buildFiltersCard() {
     return Card(
       color: EsquemaDeColores.secondary,
-      margin: const EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0),
+      margin: const EdgeInsets.only(left: 15.0, right: 10.0, top: 15.0),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(4.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -125,7 +125,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                   'Estado: ',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 19
+                    fontSize: 17
                   ),
                 ),
                 DropdownButtonHideUnderline(
@@ -144,7 +144,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                             style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.normal,
-                            fontSize: 19
+                            fontSize: 17
                             )
                           ),
                       );
@@ -155,7 +155,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                   'Rol: ',
                   style: TextStyle(
                     fontWeight: FontWeight.bold, 
-                    fontSize: 19
+                    fontSize: 17
                   ),
                 ),
                 DropdownButtonHideUnderline(
@@ -176,7 +176,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                             const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.normal,
-                            fontSize: 19
+                            fontSize: 17
                             )
                           ),
                       );
@@ -259,7 +259,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                     text: 'Email: ',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                      fontSize: 18,
                       color: EsquemaDeColores.onSecondary,
                     ),
                     children: <TextSpan>[
@@ -267,7 +267,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                         text: empleado['correo_electronico'],
                         style: const TextStyle(
                           fontWeight: FontWeight.normal,
-                          fontSize: 19,
+                          fontSize: 18,
                           color: EsquemaDeColores
                               .onPrimary, // Puedes personalizar el estilo aquí
                         ),
@@ -282,7 +282,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                       'Estado: ',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, 
-                          fontSize: 18),
+                          fontSize: 17),
                     ),
                     DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
@@ -300,7 +300,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                                 style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.normal,
-                                    fontSize: 18)),
+                                    fontSize: 17)),
                           );
                         }).toList(),
                       ),
@@ -310,7 +310,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                       style:
                           TextStyle(
                             fontWeight: FontWeight.bold, 
-                            fontSize: 18
+                            fontSize: 17
                           ),
                     ),
                     DropdownButtonHideUnderline(
@@ -329,7 +329,7 @@ class _GestionEmpleadosState extends State<GestionEmpleados> {
                                 style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.normal,
-                                    fontSize: 18
+                                    fontSize: 17
                                     )
                                   ),
                           );

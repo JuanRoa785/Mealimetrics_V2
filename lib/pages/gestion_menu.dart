@@ -538,7 +538,7 @@ class _GestionMenuState extends State<GestionMenu> with SingleTickerProviderStat
                         const Text(
                           'Categoría:',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: EsquemaDeColores.primary,
                           ),
@@ -567,7 +567,7 @@ class _GestionMenuState extends State<GestionMenu> with SingleTickerProviderStat
                               child: Text(
                                 value,
                                 style: const TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   color: EsquemaDeColores.primary,
                                 ),
                               ),
@@ -814,7 +814,7 @@ class _GestionMenuState extends State<GestionMenu> with SingleTickerProviderStat
                         const Text(
                           'Categoría:',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: EsquemaDeColores.primary,
                           ),
@@ -843,7 +843,7 @@ class _GestionMenuState extends State<GestionMenu> with SingleTickerProviderStat
                               child: Text(
                                 value,
                                 style: const TextStyle(
-                                  fontSize: 17,
+                                  fontSize: 16,
                                   color: EsquemaDeColores.primary,
                                 ),
                               ),
