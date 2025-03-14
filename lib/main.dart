@@ -9,7 +9,7 @@ import 'package:mealimetrics/Pedidos/pedidos_main.dart';
 import 'package:flutter/services.dart';
 
 const supabaseUrl = 'https://fqsdytkispydwsmcbikh.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxc2R5dGtpc3B5ZHdzbWNiaWtoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTUzNzA4MywiZXhwIjoyMDU3MTEzMDgzfQ.HG8nwPE4ev9pDbSo_rX519Skd3jT-q2tDcWCtIYICVY';
+const supabaseKey = 'SECRET_KEY_HERE';
 
 Future<void> main() async {
 //Inicializar Supabase
