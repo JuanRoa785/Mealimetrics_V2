@@ -4,7 +4,7 @@ Bienvenido a **Mealimetrics**, una aplicación desarrollada en **Flutter con Dar
 
 ## 🎥 Demo en Video
 
-🔗 [Mealimetrics en Ejecución](https://youtube.com/shorts/GM0ybeGToJE?feature=share)
+🔗 [Mealimetrics en Ejecución](https://www.youtube.com/watch?v=GM0ybeGToJE)
 
 ---
 
