@@ -1,8 +1,59 @@
-# Mealimetrics
+# 🍽️ Mealimetrics
 
-Este repositorio contiene los archivos que modelan la aplicación Mealimetrics. Una aplicación para el servicio de restauración que permite administrar pedidos de un restaurante y mostrar estadísticas respecto a estos pedidos. En este lugar, se guardarán los archivos del desarrollo progresivo de la aplicación, tanto su frontend, como su backend.
+Bienvenido a **Mealimetrics**, una aplicación desarrollada en **Flutter con Dart**, diseñada para **mejorar la eficiencia operativa de un restaurante** ficticio. El sistema facilita la gestión de pedidos, roles del personal, turnos y menú desde dispositivos móviles, digitalizando así las tareas cotidianas de meseros, chefs y gerentes.
 
-## ¿Como ejecutar el Software?
+## 🎥 Demo en Video
+
+🔗 [Mealimetrics en Ejecución](https://youtube.com/shorts/GM0ybeGToJE?feature=share)
+
+---
+
+## 📱 Funcionalidades Principales
+
+- 📝 **Toma digital de pedidos** por parte de los meseros desde sus celulares.
+- 👨‍🍳 **Visualización y control de pedidos** por parte del chef.
+- 🔔 **Notificaciones automáticas** cuando un pedido está listo para ser recogido.
+- 💵 **Control de pagos de pedidos** por parte de los meseros.
+- 🧑‍💼 **Gestión de turnos** de trabajo para empleados (meseros o cocina) por parte del gerente.
+- 📋 **Administración del menú**, incluyendo:
+  - Creación y eliminación de platillos.
+  - Gestión de los especiales disponibles.
+  - CRUD de los componentes del almuerzo (proteína, principio, bebida y sopa opcional).
+
+---
+
+## 🧑‍🤝‍🧑 Roles del Sistema
+
+| Rol     | Descripción                                                                  |
+|---------|------------------------------------------------------------------------------|
+| **Mesero** | Toma pedidos, revisa notificaciones, gestiona estado del pedido.          |
+| **Chef**   | Consulta los pedidos realizados y notifica cuando estén emplatados.       |
+| **Gerente**| Asigna turnos, gestiona el menú y los componentes del restaurante.        |
+
+---
+
+## 🧰 Tecnologías Utilizadas
+
+- **Frontend móvil**: Flutter (Dart)
+- **Backend como servicio**: [Supabase](https://supabase.com/) – base de datos PostgreSQL, autenticación y almacenamiento en la nube.
+- **Base de datos**: PostgreSQL gestionada en Supabase.
+- **Notificaciones internas**: Comunicación entre roles en tiempo real.
+- **Gestión del menú**: Modular, con componentes reutilizables.
+
+---
+
+## 📦 Estructura del Pedido
+
+Un almuerzo puede componerse de:
+
+- 🥩 **Proteína**
+- 🍚 **Principio**
+- 🥤 **Bebida**
+- 🥣 **Sopa** *(opcional)*
+
+---
+
+## 🚀 Instalación y Uso
 
 1. Instalar Flutter en tu equipo
 2. Clonar el Repositorio
