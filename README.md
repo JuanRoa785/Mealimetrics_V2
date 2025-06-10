@@ -13,7 +13,7 @@ Bienvenido a **Mealimetrics**, una aplicación desarrollada en **Flutter con Dar
 - 📝 **Toma digital de pedidos** por parte de los meseros desde sus celulares.
 - 👨‍🍳 **Visualización y control de pedidos** por parte del chef.
 - 🔔 **Notificaciones automáticas** cuando un pedido está listo para ser recogido.
-- 💵 **Control de pagos de pedidos** por parte de los meseros.
+- 💵 **Control del estado del pedido** por parte de los meseros.
 - 🧑‍💼 **Gestión de turnos** de trabajo para empleados (meseros o cocina) por parte del gerente.
 - 📋 **Administración del menú**, incluyendo:
   - Creación y eliminación de platillos.
